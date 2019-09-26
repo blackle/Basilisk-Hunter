@@ -6,6 +6,9 @@
 enum class SHA256ImplName {
 	None,
 	Naive,
+	SSE4,
+	AVX1,
+	AVX2,
 };
 
 class SHA256CompressorFactory {
