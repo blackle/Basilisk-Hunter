@@ -1,9 +1,9 @@
 #pragma once
-#include "SHA256CompressorInterface.h"
+#include "AbstractSHA256Impl.h"
 
 class SHA256Tester
 {
 public:
-	static bool verify(const SHA256CompressorInterface* impl);
-	static int benchmark(const SHA256CompressorInterface* impl);
+	static bool verify(const AbstractSHA256Impl* impl);
+	static int benchmark(const AbstractSHA256Impl* impl);
 };

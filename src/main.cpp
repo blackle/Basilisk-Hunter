@@ -1,11 +1,11 @@
-#include <crypto/SHA256CompressorFactory.h>
+#include <crypto/SHA256ImplFactory.h>
 
 int main(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
-	auto best = SHA256CompressorFactory::get_best_impl_name();
-	auto compressor = SHA256CompressorFactory::get_impl(best);
+	auto best = SHA256ImplFactory::get_best_impl_name();
+	auto compressor = SHA256ImplFactory::get_impl(best);
 
 	sha256_ctx ctx;
 	sha256_init(&ctx);

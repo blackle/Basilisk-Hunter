@@ -10,7 +10,7 @@ static const unsigned char sha256_zero_sum[] = {
 
 constexpr int BENCHMARK_ROUNDS = 200000;
 
-bool SHA256Tester::verify(const SHA256CompressorInterface* impl)
+bool SHA256Tester::verify(const AbstractSHA256Impl* impl)
 {
 	sha256_ctx ctx;
 	sha256_init(&ctx);
@@ -29,7 +29,7 @@ bool SHA256Tester::verify(const SHA256CompressorInterface* impl)
 	return true;
 }
 
-int SHA256Tester::benchmark(const SHA256CompressorInterface* impl)
+int SHA256Tester::benchmark(const AbstractSHA256Impl* impl)
 {
 	sha256_ctx ctx;
 	sha256_init(&ctx);

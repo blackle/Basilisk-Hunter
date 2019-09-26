@@ -1,4 +1,4 @@
-#include "SHA256NaiveCompressor.h"
+#include "SHA256Impl_Naive.h"
 #include <stdint.h>
 #include <cstring>
 #include <arpa/inet.h>
@@ -19,7 +19,7 @@ static const uint32_t sha256_constants[] = {
 	0x748f82ee, 0x78a5636f, 0x84c87814, 0x8cc70208, 0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2
 };
 
-void SHA256NaiveCompressor::calc_block(sha256_ctx* ctx, sha256_block* block) const
+void SHA256Impl_Naive::calc_block(sha256_ctx* ctx, sha256_block* block) const
 {
 	uint32_t i, s0, s1, t1, t2, maj, ch, w[64], h[8];
 
@@ -59,7 +59,7 @@ void SHA256NaiveCompressor::calc_block(sha256_ctx* ctx, sha256_block* block) con
 
 }
 
-bool SHA256NaiveCompressor::supported() const
+bool SHA256Impl_Naive::supported() const
 {
 	return true;
 }
