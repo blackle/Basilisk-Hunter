@@ -1,4 +1,5 @@
 #include "SHA256CompressorFactory.h"
+#include "SHA256Tester.h"
 #include "impl/SHA256NaiveCompressor.h"
 #include "impl/SHA256AVX1Compressor.h"
 #include "impl/SHA256AVX2Compressor.h"
@@ -8,8 +9,8 @@ template<typename T, SHA256ImplName TName>
 static void test_impl(SHA256ImplName& best_name, int& best_time)
 {
 	T impl;
-	if (impl.verify()) {
-		auto benchmark = impl.benchmark();
+	if (impl.supported() && SHA256Tester::verify(&impl)) {
+		auto benchmark = SHA256Tester::benchmark(&impl);
 		if (benchmark < best_time || best_time < 0) {
 			best_name = TName;
 			best_time = benchmark;
@@ -25,8 +26,6 @@ SHA256ImplName SHA256CompressorFactory::get_best_impl_name()
 	test_impl<SHA256NaiveCompressor, SHA256ImplName::Naive>(best_name, best_time);
 	test_impl<SHA256AVX1Compressor, SHA256ImplName::AVX1>(best_name, best_time);
 	test_impl<SHA256AVX2Compressor, SHA256ImplName::AVX2>(best_name, best_time);
-
-	std::cout << best_time << std::endl;
 
 	return best_name;
 }

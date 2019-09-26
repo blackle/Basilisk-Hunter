@@ -13,7 +13,6 @@ int main(int argc, char** argv)
 	sha256_block block;
 
 	compressor->calc_block(&ctx, &block);
-	compressor->verify();
 
 	return 0;
 }

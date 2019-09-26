@@ -1,4 +1,4 @@
-#include "SHA256CompressorInterface.h"
+#include "SHA256Tester.h"
 #include <chrono>
 
 static const unsigned char sha256_zero_sum[] = {
@@ -10,13 +10,13 @@ static const unsigned char sha256_zero_sum[] = {
 
 constexpr int BENCHMARK_ROUNDS = 200000;
 
-bool SHA256CompressorInterface::verify() const
+bool SHA256Tester::verify(const SHA256CompressorInterface* impl)
 {
 	sha256_ctx ctx;
 	sha256_init(&ctx);
 	sha256_block block;
 	sha256_pad_block(&block, 0, 0);
-	calc_block(&ctx, &block);
+	impl->calc_block(&ctx, &block);
 	unsigned char digest[SHA256_DIGEST_SIZE];
 	sha256_digest(&ctx, digest);
 
@@ -29,7 +29,7 @@ bool SHA256CompressorInterface::verify() const
 	return true;
 }
 
-int SHA256CompressorInterface::benchmark() const
+int SHA256Tester::benchmark(const SHA256CompressorInterface* impl)
 {
 	sha256_ctx ctx;
 	sha256_init(&ctx);
@@ -38,7 +38,7 @@ int SHA256CompressorInterface::benchmark() const
 
 	std::chrono::time_point<std::chrono::system_clock> start = std::chrono::system_clock::now();
 	for (int i = 0; i < BENCHMARK_ROUNDS; i++) {
-		calc_block(&ctx, &block);
+		impl->calc_block(&ctx, &block);
 	}
 	std::chrono::time_point<std::chrono::system_clock> stop = std::chrono::system_clock::now();
 

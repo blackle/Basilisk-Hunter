@@ -59,3 +59,7 @@ void SHA256NaiveCompressor::calc_block(sha256_ctx* ctx, sha256_block* block) con
 
 }
 
+bool SHA256NaiveCompressor::supported() const
+{
+	return true;
+}

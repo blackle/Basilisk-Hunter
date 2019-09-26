@@ -6,3 +6,7 @@ void SHA256AVX2Compressor::calc_block(sha256_ctx* ctx, sha256_block* block) cons
 	sha256_rorx(block->x, ctx->s, 1);
 }
 
+bool SHA256AVX2Compressor::supported() const
+{
+	return false;
+}
