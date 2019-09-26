@@ -1,3 +1,6 @@
 #pragma once
+#include <stdint.h>
 
-void sha256_ishaext(uint32_t state[8], const uint8_t input[], size_t blocks);
+extern "C" {
+	void sha256_ishaext(uint32_t state[8], const uint8_t input[]);
+}

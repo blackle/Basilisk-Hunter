@@ -9,6 +9,7 @@ enum class SHA256ImplName {
 	SSE4,
 	AVX1,
 	AVX2,
+	ISHAExt,
 };
 
 class SHA256CompressorFactory {
