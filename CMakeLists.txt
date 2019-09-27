@@ -2,9 +2,12 @@ cmake_minimum_required(VERSION 2.8)
 project (basilisk_hunter)
 add_subdirectory(cpu_features)
 
+message(${CMAKE_SYSTEM_PROCESSOR})
+
 include_directories(src)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h" "src/*.c")
 
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86-64")
 find_program(YASM_EXE NAMES yasm)
 if(${CMAKE_SYSTEM_NAME} MATCHES "Linux" OR ${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD")
 	set(YASM_ARGS "-f" "x64" "-f" "elf64" "-X" "gnu" "-g" "dwarf2" "-D" "LINUX")
@@ -27,6 +30,7 @@ foreach(YASM_SOURCE ${YASM_SOURCES})
 		COMMAND ${YASM_EXE}
 		ARGS ${YASM_ARGS} -o ${YASM_OBJECT} ${YASM_SOURCE} )
 endforeach()
+endif()
 
 add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
 target_link_libraries(basilisk_hunter cpu_features)
