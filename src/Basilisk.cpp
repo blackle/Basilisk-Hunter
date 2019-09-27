@@ -1,7 +1,7 @@
 #include "Basilisk.h"
 #include <cstring>
 
-Basilisk::Basilisk(const AbstractSHA256Impl* sha, const std::string& prefix, int nonce_length)
+Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, int nonce_length)
 	: m_sha(sha)
 {
 	(void) prefix;

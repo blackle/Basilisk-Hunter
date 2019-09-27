@@ -1,6 +1,6 @@
 #pragma once
 
-#include "AbstractSHA256Impl.h"
+#include "SHA256Impl.h"
 #include <memory>
 
 enum class SHA256ImplName {
@@ -16,5 +16,5 @@ class SHA256ImplFactory {
 public:
 
 	static SHA256ImplName get_best_impl_name();
-	static std::unique_ptr<const AbstractSHA256Impl> get_impl(SHA256ImplName impl);
+	static std::unique_ptr<const SHA256Impl> get_impl(SHA256ImplName impl);
 };

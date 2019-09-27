@@ -35,9 +35,9 @@ SHA256ImplName SHA256ImplFactory::get_best_impl_name()
 	return best_name;
 }
 
-std::unique_ptr<const AbstractSHA256Impl> SHA256ImplFactory::get_impl(SHA256ImplName impl_name)
+std::unique_ptr<const SHA256Impl> SHA256ImplFactory::get_impl(SHA256ImplName impl_name)
 {
-	std::unique_ptr<AbstractSHA256Impl> impl;
+	std::unique_ptr<SHA256Impl> impl;
 	switch (impl_name) {
 		case SHA256ImplName::Naive:
 			impl.reset(new SHA256Impl_Naive);

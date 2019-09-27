@@ -1,16 +1,16 @@
 #pragma once
 
 #include <crypto/SHA256.h>
-#include <crypto/AbstractSHA256Impl.h>
+#include <crypto/SHA256Impl.h>
 #include <string>
 
 class Basilisk {
 public:
-	explicit Basilisk(const AbstractSHA256Impl* sha, const std::string& prefix, int nonce_length);
+	explicit Basilisk(const SHA256Impl* sha, const std::string& prefix, int nonce_length);
 	void step();
 
 private:
-	const AbstractSHA256Impl* m_sha;
+	const SHA256Impl* m_sha;
 
 	sha256_ctx m_ctx_initial;
 	sha256_ctx m_ctx_working;

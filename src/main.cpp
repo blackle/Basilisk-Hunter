@@ -1,7 +1,9 @@
 #include <crypto/SHA256ImplFactory.h>
+#include <crypto/SHA256.h>
 #include <Basilisk.h>
 #include <chrono>
 #include <iostream>
+#include  <iomanip>
 
 namespace chrono = std::chrono;
 
@@ -11,8 +13,18 @@ int main(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
+
+	SHA256Block block("1234567890123456789012345678901234567890123456789012345", 5);
+	for (auto i = block.begin(); i != block.end(); i++) {
+		std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i << " ";
+	}
+	std::cout << std::endl;
+
 	auto best = SHA256ImplFactory::get_best_impl_name();
 	auto compressor = SHA256ImplFactory::get_impl(best).release();
+	if (!compressor) {
+		return -1;
+	}
 
 	Basilisk basilisk(compressor, "", 0);
 

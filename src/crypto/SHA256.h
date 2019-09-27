@@ -1,10 +1,36 @@
 #pragma once
 
 #include <stdint.h>
-// #include <array> //TODO
+#include <string>
+#include <array>
 
+constexpr int SHA256_STATE_SIZE = 8;
 constexpr int SHA256_DIGEST_SIZE = 32;
 constexpr int SHA256_BLOCK_SIZE = 64;
+
+class SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
+{
+public:
+	SHA256State();
+
+private:
+	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
+};
+
+class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
+{
+public:
+	SHA256Block(const std::string& data);
+	SHA256Block(const std::string& data, size_type total_length);
+
+	iterator content_end() noexcept;
+	const_iterator content_end() const noexcept;
+
+private:
+	typedef std::array<uint8_t, SHA256_BLOCK_SIZE> super;
+
+	size_type m_content_end;
+};
 
 typedef struct {
 	unsigned char x[SHA256_BLOCK_SIZE];
