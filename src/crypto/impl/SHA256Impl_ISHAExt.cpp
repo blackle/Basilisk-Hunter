@@ -6,16 +6,6 @@
 static const cpu_features::X86Features features = cpu_features::GetX86Info().features;
 #endif
 
-void SHA256Impl_ISHAExt::calc_block(sha256_ctx* ctx, sha256_block* block) const
-{
-#if defined(__x84_64__) && defined(__SHA__)
-	sha256_ishaext(ctx->s, block->x);
-#else
-	(void)ctx;
-	(void)block;
-#endif
-}
-
 void SHA256Impl_ISHAExt::calc_block(SHA256State* state, const SHA256Block* block) const
 {
 #if defined(__x86_64__) && defined(__SHA__)

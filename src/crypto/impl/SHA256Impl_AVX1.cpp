@@ -6,16 +6,6 @@
 static const cpu_features::X86Features features = cpu_features::GetX86Info().features;
 #endif
 
-void SHA256Impl_AVX1::calc_block(sha256_ctx* ctx, sha256_block* block) const
-{
-#if defined(__x86_64__)
-	sha256_avx(block->x, ctx->s, 1);
-#else
-	(void)ctx;
-	(void)block;
-#endif
-}
-
 void SHA256Impl_AVX1::calc_block(SHA256State* state, const SHA256Block* block) const
 {
 #if defined(__x86_64__)
