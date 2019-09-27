@@ -1,5 +1,5 @@
 #include "SHA256Impl_ISHAExt.h"
-#include "bits/sha256_ishaext.h"
+#include "bits_x86_64/sha256_ishaext.h"
 
 #if defined(__x86_64__)
 #include "cpuinfo_x86.h"

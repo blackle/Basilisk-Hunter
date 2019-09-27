@@ -1,5 +1,5 @@
 #include "SHA256Impl_SSE4.h"
-#include "bits/sha256_sse4.h"
+#include "bits_x86_64/sha256_sse4.h"
 
 #if defined(__x86_64__)
 #include "cpuinfo_x86.h"

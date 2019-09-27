@@ -1,5 +1,5 @@
 #include "SHA256Impl_AVX2.h"
-#include "bits/sha256_avx2_rorx2.h"
+#include "bits_x86_64/sha256_avx2_rorx2.h"
 
 #if defined(__x86_64__)
 #include "cpuinfo_x86.h"

@@ -20,8 +20,8 @@ private:
 class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
 {
 public:
-	SHA256Block(const std::string& data);
-	SHA256Block(const std::string& data, size_type total_length);
+	explicit SHA256Block(const std::string& data);
+	explicit SHA256Block(const std::string& data, size_type total_length);
 
 	iterator content_end() noexcept;
 	const_iterator content_end() const noexcept;
