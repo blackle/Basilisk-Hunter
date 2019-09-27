@@ -8,14 +8,8 @@ constexpr int SHA256_STATE_SIZE = 8;
 constexpr int SHA256_DIGEST_SIZE = 32;
 constexpr int SHA256_BLOCK_SIZE = 64;
 
-class SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
-{
-public:
-	SHA256State();
-
-private:
-	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
-};
+class SHA256Digest : public std::array<uint8_t, SHA256_DIGEST_SIZE>
+{};
 
 class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
 {
@@ -26,10 +20,25 @@ public:
 	iterator content_end() noexcept;
 	const_iterator content_end() const noexcept;
 
+	size_type content_length() const;
+
 private:
 	typedef std::array<uint8_t, SHA256_BLOCK_SIZE> super;
 
 	size_type m_content_end;
+};
+
+class SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
+{
+public:
+	SHA256State();
+	void reset();
+
+	void digest(SHA256Digest& digest);
+	void digest(SHA256Block& digest);
+
+private:
+	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
 };
 
 typedef struct {
@@ -40,6 +49,6 @@ typedef struct {
 	uint32_t s[8];
 } sha256_ctx;
 
-void sha256_init(sha256_ctx * ctx);
-void sha256_pad_block(sha256_block * block, int offset, int length);
-void sha256_digest(sha256_ctx * ctx, unsigned char* digest);
+// void sha256_init(sha256_ctx * ctx);
+// void sha256_pad_block(sha256_block * block, int offset, int length);
+// void sha256_digest(sha256_ctx * ctx, unsigned char* digest);

@@ -5,16 +5,24 @@
 #include <algorithm>
 #include <iostream>
 
-static constexpr uint32_t sha256_h0_old[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
+// static constexpr uint32_t sha256_h0_old[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 static const std::array<uint32_t, SHA256_STATE_SIZE> sha256_h0 = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
 SHA256State::SHA256State()
 	: super(sha256_h0)
 {}
 
-void sha256_init(sha256_ctx *ctx) {
-	(void)ctx;
-	std::memcpy(ctx->s, sha256_h0_old, sizeof(sha256_h0_old));
+void SHA256State::reset()
+{
+	std::copy(sha256_h0.begin(), sha256_h0.end(), begin());
+}
+
+void SHA256State::digest(SHA256Digest& digest) {
+	(void) digest;
+}
+
+void SHA256State::digest(SHA256Block& digest) {
+	(void) digest;
 }
 
 //endianness is annoying, eh?
@@ -67,21 +75,30 @@ SHA256Block::const_iterator SHA256Block::content_end() const noexcept
 	return begin()+m_content_end;
 }
 
-void sha256_pad_block(sha256_block * block, int offset, int length) {
-	assert((SHA256_BLOCK_SIZE - 9) >= offset);
-
-	int len_b = length << 3;
-	int pm_len = 1 << 6;
-
-	std::memset(block->x + offset, 0, pm_len - offset);
-	block->x[offset] = 0x80;
-	uint32_t* encoded_len = (uint32_t*)(block->x + pm_len - 4);
-	*encoded_len = htonl(len_b);
+SHA256Block::size_type SHA256Block::content_length() const
+{
+	return m_content_end;
 }
 
-void sha256_digest(sha256_ctx * ctx, unsigned char* digest) {
-	uint32_t* digest_32 = (uint32_t*)digest;
-	for (int i = 0 ; i < 8; i++) {
-		digest_32[i] = htonl(ctx->s[i]);
-	}
-}
+// void sha256_init(sha256_ctx *ctx) {
+// 	(void)ctx;
+// 	std::memcpy(ctx->s, sha256_h0_old, sizeof(sha256_h0_old));
+// }
+// void sha256_pad_block(sha256_block * block, int offset, int length) {
+// 	assert((SHA256_BLOCK_SIZE - 9) >= offset);
+
+// 	int len_b = length << 3;
+// 	int pm_len = 1 << 6;
+
+// 	std::memset(block->x + offset, 0, pm_len - offset);
+// 	block->x[offset] = 0x80;
+// 	uint32_t* encoded_len = (uint32_t*)(block->x + pm_len - 4);
+// 	*encoded_len = htonl(len_b);
+// }
+
+// void sha256_digest(sha256_ctx * ctx, unsigned char* digest) {
+// 	uint32_t* digest_32 = (uint32_t*)digest;
+// 	for (int i = 0 ; i < 8; i++) {
+// 		digest_32[i] = htonl(ctx->s[i]);
+// 	}
+// }

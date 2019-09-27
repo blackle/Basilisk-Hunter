@@ -7,18 +7,24 @@ Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, int nonce_l
 	(void) prefix;
 	(void) nonce_length;
 
-	sha256_init(&m_ctx_initial);
-	m_sha->calc_block(&m_ctx_initial, &m_block_nonce);
+	m_block_nonce.reset(new SHA256Block("", 0));
+
+	// sha256_init(&m_ctx_initial);
+	// m_sha->calc_block(&m_ctx_initial, &m_block_nonce);
 }
 
 void Basilisk::step()
 {
-	std::memcpy(&m_ctx_working, &m_ctx_initial, sizeof(sha256_ctx));
-	// increment_nonce(&block_nonce);
-	m_sha->calc_block(&m_ctx_working, &m_block_nonce);
+	m_ctx_working = m_ctx_initial;
+	// std::memcpy(&m_ctx_working, &m_ctx_initial, sizeof(sha256_ctx));
+	// // increment_nonce(&block_nonce);
+	m_sha->calc_block(&m_ctx_working, m_block_nonce.get());
 
-	sha256_digest(&m_ctx_working, m_block_final.x);
+	m_ctx_final.reset();
+	m_sha->calc_block(&m_ctx_final, m_block_nonce.get());
 
-	sha256_init(&m_ctx_final);
-	m_sha->calc_block(&m_ctx_final, &m_block_final);
+	// sha256_digest(&m_ctx_working, m_block_final.x);
+
+	// sha256_init(&m_ctx_final);
+	// m_sha->calc_block(&m_ctx_final, &m_block_final);
 }
