@@ -14,6 +14,16 @@ void SHA256Impl_ISHAExt::calc_block(sha256_ctx* ctx, sha256_block* block) const
 #endif
 }
 
+void SHA256Impl_ISHAExt::calc_block(SHA256State* state, const SHA256Block* block) const
+{
+#if defined(__SHA__)
+	sha256_avx(state->data(), block->data());
+#else
+	(void)state;
+	(void)block;
+#endif
+}
+
 bool SHA256Impl_ISHAExt::supported() const
 {
 	return features.sha;

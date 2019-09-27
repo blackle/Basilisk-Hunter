@@ -1,5 +1,6 @@
 #include "SHA256Impl_Naive.h"
 #include <stdint.h>
+#include <array>
 #include <cstring>
 #include <arpa/inet.h>
 
@@ -56,6 +57,46 @@ void SHA256Impl_Naive::calc_block(sha256_ctx* ctx, sha256_block* block) const
 	// add results back to digest
 	for ( i = 0; i < 8; i++ )
 		ctx->s[i] += h[i];
+
+}
+
+void SHA256Impl_Naive::calc_block(SHA256State* state, const SHA256Block* block) const
+{
+	uint32_t i, s0, s1, t1, t2, maj, ch;
+	std::array<uint32_t, 64> w;
+	SHA256State h(*state);
+	// load data into message schedule
+	for ( i = 0; i < 16; i++ )
+		w[i] = htonl( reinterpret_cast<const uint32_t*>(block->data())[i] );
+
+	// fill remainder of message schedule
+	for ( i = 16; i < 64; i++ ) {
+		s0 = ror32( w[i - 15], 7 ) ^ ror32( w[i - 15], 18 ) ^ ( w[i - 15] >> 3 );
+		s1 = ror32( w[i - 2], 17 ) ^ ror32( w[i - 2], 19 ) ^ ( w[i - 2] >> 10 );
+		w[i] = w[i - 16] + s0 + w[i - 7] + s1;
+	}
+
+	// the actual transform
+	for ( i = 0; i < 64; i++ ) {
+		s1 = ror32( h[4], 6 ) ^ ror32( h[4], 11 ) ^ ror32( h[4], 25 );
+		ch = ( h[4] & h[5] ) ^ ( ( ~h[4] ) & h[6] );
+		t1 = h[7] + s1 + ch + sha256_constants[i] + w[i];
+		s0 = ror32( h[0], 2 ) ^ ror32( h[0], 13 ) ^ ror32( h[0], 22 );
+		maj = ( h[0] & h[1] ) ^ ( h[0] & h[2] ) ^ ( h[1] & h[2] );
+		t2 = s0 + maj;
+
+		h[7] = h[6];
+		h[6] = h[5];
+		h[5] = h[4];
+		h[4] = h[3] + t1;
+		h[3] = h[2];
+		h[2] = h[1];
+		h[1] = h[0];
+		h[0] = t1 + t2;
+	}
+	// add results back to digest
+	for ( i = 0; i < 8; i++ )
+		(*state)[i] += h[i];
 
 }
 

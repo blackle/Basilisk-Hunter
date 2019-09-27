@@ -3,7 +3,7 @@
 #include <Basilisk.h>
 #include <chrono>
 #include <iostream>
-#include  <iomanip>
+#include <iomanip>
 
 namespace chrono = std::chrono;
 
@@ -14,7 +14,8 @@ int main(int argc, char** argv)
 	(void)argc;
 	(void)argv;
 
-	SHA256Block block("1234567890123456789012345678901234567890123456789012345", 5);
+	SHA256State state;
+	SHA256Block block("", 0);
 	for (auto i = block.begin(); i != block.end(); i++) {
 		std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i << " ";
 	}
@@ -25,6 +26,13 @@ int main(int argc, char** argv)
 	if (!compressor) {
 		return -1;
 	}
+
+	compressor->calc_block(&state, &block);
+	for (auto i = state.begin(); i != state.end(); i++) {
+		std::cout << std::setfill('0') << std::setw(8) << std::hex << (int)*i;
+	}
+	std::cout << std::endl;
+
 
 	Basilisk basilisk(compressor, "", 0);
 

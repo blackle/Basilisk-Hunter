@@ -9,6 +9,11 @@ void SHA256Impl_AVX1::calc_block(sha256_ctx* ctx, sha256_block* block) const
 	sha256_avx(block->x, ctx->s, 1);
 }
 
+void SHA256Impl_AVX1::calc_block(SHA256State* state, const SHA256Block* block) const
+{
+	sha256_avx(block->data(), state->data(), 1);
+}
+
 bool SHA256Impl_AVX1::supported() const
 {
 	return features.avx;
