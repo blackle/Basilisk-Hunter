@@ -18,7 +18,10 @@ void SHA256State::reset()
 }
 
 void SHA256State::digest(SHA256Digest& digest) {
-	(void) digest;
+	auto digest_alias = reinterpret_cast<uint32_t*>(digest.data());
+	for (size_type i = 0; i < size(); i++) { //change to iterators?
+		digest_alias[i] = htonl(at(i));
+	}
 }
 
 void SHA256State::digest(SHA256Block& digest) {

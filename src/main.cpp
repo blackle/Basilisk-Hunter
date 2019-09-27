@@ -16,10 +16,10 @@ int main(int argc, char** argv)
 
 	SHA256State state;
 	SHA256Block block("", 0);
-	for (auto i = block.begin(); i != block.end(); i++) {
-		std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i << " ";
-	}
-	std::cout << std::endl;
+	//for (auto i = block.begin(); i != block.end(); i++) {
+	//	std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i << " ";
+	//}
+	//std::cout << std::endl;
 
 	auto best = SHA256ImplFactory::get_best_impl_name();
 	auto compressor = SHA256ImplFactory::get_impl(best).release();
@@ -28,8 +28,10 @@ int main(int argc, char** argv)
 	}
 
 	compressor->calc_block(&state, &block);
-	for (auto i = state.begin(); i != state.end(); i++) {
-		std::cout << std::setfill('0') << std::setw(8) << std::hex << (int)*i;
+	SHA256Digest digest;
+	state.digest(digest);
+	for (auto i = digest.begin(); i != digest.end(); i++) {
+		std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
 	}
 	std::cout << std::endl;
 
