@@ -2,18 +2,14 @@
 
 #include <crypto/SHA256.h>
 #include <string>
+#include <type_traits>
 
 class NonceUtil
 {
 public:
 	static std::string build(int length);
-	template<typename I>
-	static void increment(I begin, I end);
-};
-
-template <typename I>
-void NonceUtil::increment(I begin, I end)
-{
+	template<typename I, typename = std::enable_if<std::is_same<typename std::iterator_traits<I>::value_type, std::uint8_t>::value>>
+	static void increment(I begin, I end) {
 	for (auto i = begin; i != end; i++) {
 	        char res =  *i;
                 res++;
@@ -32,4 +28,6 @@ void NonceUtil::increment(I begin, I end)
                                 return;
                 }
         }
-}
+	}
+};
+

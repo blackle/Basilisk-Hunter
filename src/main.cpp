@@ -16,11 +16,10 @@ int main(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
-	std::cout << NonceUtil::build(1) << std::endl;
-	SHA256Block nonceBlock(NonceUtil::build(2), 2);
+	auto nonce = NonceUtil::build(10);
 	for (int k = 0; k < 100; k++){
-	NonceUtil::increment(nonceBlock.begin(), nonceBlock.content_end());
-	for (auto i = nonceBlock.begin(); i != nonceBlock.content_end(); i++) {
+	NonceUtil::increment(nonce.begin(), nonce.end());
+	for (auto i = nonce.begin(); i != nonce.end(); i++) {
 		std::cout << *i;
 	}
 	std::cout << std::endl;
