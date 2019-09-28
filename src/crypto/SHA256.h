@@ -35,8 +35,8 @@ public:
 	SHA256State();
 	void reset();
 
-	void digest(SHA256Digest& digest);
-	void digest(SHA256Block& digest);
+	void digest(SHA256Digest* digest);
+	void digest(SHA256Block* digest);
 
 private:
 	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;

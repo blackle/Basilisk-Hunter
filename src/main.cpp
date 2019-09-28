@@ -37,14 +37,14 @@ int main(int argc, char** argv)
 
 	compressor->calc_block(&state, &block);
 	SHA256Block digest(SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE);
-	state.digest(digest);
+	state.digest(&digest);
 	for (auto i = digest.begin(); i != digest.end(); i++) {
 		std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
 	}
 	std::cout << std::endl;
 
 
-	Basilisk basilisk(compressor, "", 0);
+	Basilisk basilisk(compressor, "basilisk|0000000000|", 64);
 
 	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
 	for (int i = 0; i < BENCHMARK_ROUNDS; i++) {

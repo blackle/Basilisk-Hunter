@@ -17,19 +17,19 @@ void SHA256State::reset()
 	std::copy(sha256_h0.begin(), sha256_h0.end(), begin());
 }
 
-void SHA256State::digest(SHA256Digest& digest) {
-	auto digest_alias = reinterpret_cast<uint32_t*>(digest.data());
+void SHA256State::digest(SHA256Digest* digest) {
+	auto digest_alias = reinterpret_cast<uint32_t*>(digest->data());
 	for (size_type i = 0; i < size(); i++) {
 		digest_alias[i] = htonl(at(i));
 	}
 }
 
-void SHA256State::digest(SHA256Block& digest) {
-	if (digest.content_length() != SHA256_DIGEST_SIZE) {
+void SHA256State::digest(SHA256Block* digest) {
+	if (digest->content_length() != SHA256_DIGEST_SIZE) {
 		throw "Block must be padded to digest size";
 	}
 
-	auto digest_alias = reinterpret_cast<uint32_t*>(digest.data());
+	auto digest_alias = reinterpret_cast<uint32_t*>(digest->data());
 	for (size_type i = 0; i < size(); i++) {
 		digest_alias[i] = htonl(at(i));
 	}

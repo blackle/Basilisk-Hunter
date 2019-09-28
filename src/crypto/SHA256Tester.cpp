@@ -20,22 +20,9 @@ bool SHA256Tester::verify(const SHA256Impl* impl)
 	impl->calc_block(&state, &empty_block);
 
 	SHA256Digest digest;
-	state.digest(digest);
+	state.digest(&digest);
 
-	// TODO is there an std::compare?
-	//for (auto i = digest.begin(); i != digest.end(); i++) {
-	//	if (
-	//}
 	return digest == sha256_zero_sum;
-/*
-	for (int i = 0; i < SHA256_DIGEST_SIZE; i++) {
-		if (sha256_zero_sum[i] != digest[i]) {
-			return false;
-		}
-	}
-
-	return true;
-*/
 }
 
 int SHA256Tester::benchmark(const SHA256Impl* impl)

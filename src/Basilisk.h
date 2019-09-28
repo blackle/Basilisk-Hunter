@@ -7,7 +7,7 @@
 
 class Basilisk {
 public:
-	explicit Basilisk(const SHA256Impl* sha, const std::string& prefix, int nonce_length);
+	explicit Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned nonce_length);
 	void step();
 
 private:
