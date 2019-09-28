@@ -10,6 +10,7 @@ enum class SHA256ImplName {
 	AVX1,
 	AVX2,
 	ISHAExt,
+	Arm,
 };
 
 class SHA256ImplFactory {

@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project (basilisk_hunter)
+project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
 
 message(${CMAKE_SYSTEM_PROCESSOR})
@@ -30,6 +30,10 @@ foreach(YASM_SOURCE ${YASM_SOURCES})
 		COMMAND ${YASM_EXE}
 		ARGS ${YASM_ARGS} -o ${YASM_OBJECT} ${YASM_SOURCE} )
 endforeach()
+endif()
+
+if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
+set(SOURCES "src/crypto/impl/bits_arm/sha256-armv8-aarch64.S" ${SOURCES})
 endif()
 
 add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})

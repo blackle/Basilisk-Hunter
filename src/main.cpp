@@ -16,6 +16,7 @@ int main(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
+/*
 	auto nonce = NonceUtil::build(10);
 	for (int k = 0; k < 100; k++){
 	NonceUtil::increment(nonce.begin(), nonce.end());
@@ -24,7 +25,7 @@ int main(int argc, char** argv)
 	}
 	std::cout << std::endl;
 	}
-
+*/
 	SHA256State state;
 	SHA256Block block("", 0);
 
