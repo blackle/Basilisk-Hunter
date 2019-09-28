@@ -18,7 +18,7 @@ std::string NonceUtil::build(int length)
 	std::mt19937 rng(dev());
 	std::uniform_int_distribution<> dist(0, NONCE_ALPHABET_SIZE-1);
 
-	std::string nonce('0', length);
+	std::string nonce(length, '0');
 	std::generate(nonce.begin(), nonce.end(), [&] {
 		return NONCE_ALPHABET[dist(rng)];
 	});

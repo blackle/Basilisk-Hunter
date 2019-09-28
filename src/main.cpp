@@ -10,19 +10,24 @@ namespace chrono = std::chrono;
 
 constexpr int BENCHMARK_ROUNDS = 10000000;
 
+//TODO add ostream operators to sha256 classes
+
 int main(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
-
-	std::cout << NonceUtil::build(10) << std::endl;
+	std::cout << NonceUtil::build(1) << std::endl;
+	SHA256Block nonceBlock(NonceUtil::build(2), 2);
+	for (int k = 0; k < 100; k++){
+	NonceUtil::increment(nonceBlock.begin(), nonceBlock.content_end());
+	for (auto i = nonceBlock.begin(); i != nonceBlock.content_end(); i++) {
+		std::cout << *i;
+	}
+	std::cout << std::endl;
+	}
 
 	SHA256State state;
 	SHA256Block block("", 0);
-	//for (auto i = block.begin(); i != block.end(); i++) {
-	//	std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i << " ";
-	//}
-	//std::cout << std::endl;
 
 	auto best = SHA256ImplFactory::get_best_impl_name();
 	auto compressor = SHA256ImplFactory::get_impl(best).release();

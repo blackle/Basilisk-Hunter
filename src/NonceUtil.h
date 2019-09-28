@@ -7,6 +7,29 @@ class NonceUtil
 {
 public:
 	static std::string build(int length);
-	static void increment(SHA256Block& block);
+	template<typename I>
+	static void increment(I begin, I end);
 };
 
+template <typename I>
+void NonceUtil::increment(I begin, I end)
+{
+	for (auto i = begin; i != end; i++) {
+	        char res =  *i;
+                res++;
+		switch (res) {
+                        case '{':
+                                *i = '0';
+                                continue;
+                        case '[':
+                                *i = 'a';
+                                return;
+                        case ':':
+                                *i = 'A';
+                                return;
+                        default:
+                                *i = res;
+                                return;
+                }
+        }
+}
