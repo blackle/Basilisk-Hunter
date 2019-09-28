@@ -19,13 +19,20 @@ void SHA256State::reset()
 
 void SHA256State::digest(SHA256Digest& digest) {
 	auto digest_alias = reinterpret_cast<uint32_t*>(digest.data());
-	for (size_type i = 0; i < size(); i++) { //change to iterators?
+	for (size_type i = 0; i < size(); i++) {
 		digest_alias[i] = htonl(at(i));
 	}
 }
 
 void SHA256State::digest(SHA256Block& digest) {
-	(void) digest;
+	if (digest.content_length() != SHA256_DIGEST_SIZE) {
+		throw "Block must be padded to digest size";
+	}
+
+	auto digest_alias = reinterpret_cast<uint32_t*>(digest.data());
+	for (size_type i = 0; i < size(); i++) {
+		digest_alias[i] = htonl(at(i));
+	}
 }
 
 //endianness is annoying, eh?
@@ -55,11 +62,21 @@ SHA256Block::SHA256Block(const std::string& data)
 SHA256Block::SHA256Block(const std::string& data, size_type total_length)
 {
 	m_content_end = data.length();
+	std::copy(data.begin(), data.end(), begin());
+	init_padding(total_length);
+}
+
+SHA256Block::SHA256Block(size_type offset, size_type total_length)
+{
+	m_content_end = offset;
+	init_padding(total_length);
+}
+
+void SHA256Block::init_padding(size_type total_length)
+{
 	if (m_content_end > (SHA256_BLOCK_SIZE - 9)) {
 		throw "Cannot pad this block, not enough room!";
 	}
-
-	std::copy(data.begin(), data.end(), begin());
 
 	std::fill(content_end(), end(), 0);
 	*content_end() = 0x80;

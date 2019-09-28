@@ -4,6 +4,7 @@
 #include <chrono>
 #include <iostream>
 #include <iomanip>
+#include "NonceUtil.h"
 
 namespace chrono = std::chrono;
 
@@ -13,6 +14,8 @@ int main(int argc, char** argv)
 {
 	(void)argc;
 	(void)argv;
+
+	std::cout << NonceUtil::build(10) << std::endl;
 
 	SHA256State state;
 	SHA256Block block("", 0);
@@ -28,7 +31,7 @@ int main(int argc, char** argv)
 	}
 
 	compressor->calc_block(&state, &block);
-	SHA256Digest digest;
+	SHA256Block digest(SHA256_DIGEST_SIZE, SHA256_DIGEST_SIZE);
 	state.digest(digest);
 	for (auto i = digest.begin(); i != digest.end(); i++) {
 		std::cout << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
