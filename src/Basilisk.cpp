@@ -50,3 +50,7 @@ void Basilisk::digest(SHA256Digest* digest) const
 	m_ctx_final.digest(digest);
 }
 
+bool Basilisk::compare(uint32_t val) const
+{
+	return m_ctx_final[0] < val;
+}

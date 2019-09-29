@@ -20,15 +20,13 @@ int main(int argc, char** argv)
 	}
 
 	Basilisk basilisk(compressor, "basilisk|0000000000|", 64);
-	SHA256Digest digest;
-	SHA256Digest target = {0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
+
 	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
 	int hashes = 0;
 	while (true) {
 		basilisk.step();
-		basilisk.digest(&digest);
 		hashes++;
-		if (digest < target) {
+		if (basilisk.compare(0xF)) {
 			break;
 		}
 	}
@@ -37,6 +35,8 @@ int main(int argc, char** argv)
 	auto time = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 	std::cout << "time: " << (hashes/(float)time * 1000./1000000.) << std::endl;
 
+	SHA256Digest digest;
+	basilisk.digest(&digest);
 	std::cout << basilisk.challenge() << " " << digest << std::endl;
 
 	return 0;

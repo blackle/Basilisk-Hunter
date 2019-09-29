@@ -11,6 +11,7 @@ public:
 	void step();
 	std::string challenge();
 	void digest(SHA256Digest* digest) const;
+	bool compare(uint32_t) const;
 
 private:
 	const SHA256Impl* m_sha;
