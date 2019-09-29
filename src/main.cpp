@@ -21,14 +21,14 @@ int main(int argc, char** argv)
 
 	Basilisk basilisk(compressor, "basilisk|0000000000|", 64);
 	SHA256Digest digest;
-
+	SHA256Digest target = {0x00, 0x00, 0x00, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF };
 	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
 	int hashes = 0;
 	while (true) {
 		basilisk.step();
 		basilisk.digest(&digest);
 		hashes++;
-		if (digest[0] == 0 && digest[1] == 0 && digest[2] == 0) {
+		if (digest < target) {
 			break;
 		}
 	}
