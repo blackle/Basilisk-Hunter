@@ -8,8 +8,6 @@
 
 namespace chrono = std::chrono;
 
-constexpr int BENCHMARK_ROUNDS = 10000000;
-
 int main(int argc, char** argv)
 {
 	(void)argc;
@@ -22,18 +20,23 @@ int main(int argc, char** argv)
 	}
 
 	Basilisk basilisk(compressor, "basilisk|0000000000|", 64);
+	SHA256Digest digest;
 
 	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
-	for (int i = 0; i < BENCHMARK_ROUNDS; i++) {
+	int hashes = 0;
+	while (true) {
 		basilisk.step();
+		basilisk.digest(&digest);
+		hashes++;
+		if (digest[0] == 0 && digest[1] == 0 && digest[2] == 0) {
+			break;
+		}
 	}
 	chrono::time_point<chrono::system_clock> stop = chrono::system_clock::now();
 
 	auto time = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
-	std::cout << "time: " << (BENCHMARK_ROUNDS/(float)time * 1000./1000000.) << std::endl;
+	std::cout << "time: " << (hashes/(float)time * 1000./1000000.) << std::endl;
 
-	SHA256Digest digest;
-	basilisk.digest(&digest);
 	std::cout << basilisk.challenge() << " " << digest << std::endl;
 
 	return 0;
