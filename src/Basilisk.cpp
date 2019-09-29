@@ -1,15 +1,14 @@
 #include "Basilisk.h"
 #include "NonceUtil.h"
-#include <cstring>
 
 constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
 
 Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned nonce_length)
 	: m_sha(sha)
 {
-	auto challenge = prefix + NonceUtil::build(nonce_length);
+	m_challenge = prefix + NonceUtil::build(nonce_length);
 
-	auto residual = challenge;
+	auto residual = m_challenge;
 	while (residual.length() >= SHA256_BLOCK_SIZE) {
 		SHA256Block block(residual.substr(0, SHA256_BLOCK_SIZE));
 		m_sha->calc_block(&m_ctx_initial, &block);
@@ -24,7 +23,7 @@ Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned no
 		throw "Not enough entropy in last block";
 	}
 
-	m_block_nonce.reset(new SHA256Block(residual, challenge.length()));
+	m_block_nonce.reset(new SHA256Block(residual, m_challenge.length()));
 	m_block_final.reset(new SHA256Block(32,32));
 }
 
@@ -39,3 +38,15 @@ void Basilisk::step()
 	m_ctx_final.reset();
 	m_sha->calc_block(&m_ctx_final, m_block_final.get());
 }
+
+std::string Basilisk::challenge()
+{
+	std::copy(m_block_nonce->begin(), m_block_nonce->content_end(), m_challenge.end()-m_block_nonce->content_length());
+	return m_challenge;
+}
+
+void Basilisk::digest(SHA256Digest* digest) const
+{
+	m_ctx_final.digest(digest);
+}
+

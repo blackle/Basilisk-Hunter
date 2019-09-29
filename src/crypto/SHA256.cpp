@@ -4,8 +4,8 @@
 #include <arpa/inet.h>
 #include <algorithm>
 #include <iostream>
+#include <iomanip>
 
-// static constexpr uint32_t sha256_h0_old[8] = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 static const std::array<uint32_t, SHA256_STATE_SIZE> sha256_h0 = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
 SHA256State::SHA256State()
@@ -17,14 +17,16 @@ void SHA256State::reset()
 	std::copy(sha256_h0.begin(), sha256_h0.end(), begin());
 }
 
-void SHA256State::digest(SHA256Digest* digest) {
+void SHA256State::digest(SHA256Digest* digest) const
+{
 	auto digest_alias = reinterpret_cast<uint32_t*>(digest->data());
 	for (size_type i = 0; i < size(); i++) {
 		digest_alias[i] = htonl(at(i));
 	}
 }
 
-void SHA256State::digest(SHA256Block* digest) {
+void SHA256State::digest(SHA256Block* digest) const
+{
 	if (digest->content_length() != SHA256_DIGEST_SIZE) {
 		throw "Block must be padded to digest size";
 	}
@@ -100,25 +102,32 @@ SHA256Block::size_type SHA256Block::content_length() const
 	return m_content_end;
 }
 
-// void sha256_init(sha256_ctx *ctx) {
-// 	(void)ctx;
-// 	std::memcpy(ctx->s, sha256_h0_old, sizeof(sha256_h0_old));
-// }
-// void sha256_pad_block(sha256_block * block, int offset, int length) {
-// 	assert((SHA256_BLOCK_SIZE - 9) >= offset);
+std::ostream& operator<<(std::ostream& os, const SHA256Digest& digest)
+{
+	std::ios_base::fmtflags f(os.flags());
+	for (auto i = digest.begin(); i != digest.end(); i++) {
+                os << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
+        }
+	os.flags(f);
+	return os;
+}
 
-// 	int len_b = length << 3;
-// 	int pm_len = 1 << 6;
+std::ostream& operator<<(std::ostream& os, const SHA256Block& block)
+{
+	std::ios_base::fmtflags f(os.flags());
+	for (auto i = block.begin(); i != block.end(); i++) {
+                os << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
+        }
+	os.flags(f);
+	return os;
+}
 
-// 	std::memset(block->x + offset, 0, pm_len - offset);
-// 	block->x[offset] = 0x80;
-// 	uint32_t* encoded_len = (uint32_t*)(block->x + pm_len - 4);
-// 	*encoded_len = htonl(len_b);
-// }
-
-// void sha256_digest(sha256_ctx * ctx, unsigned char* digest) {
-// 	uint32_t* digest_32 = (uint32_t*)digest;
-// 	for (int i = 0 ; i < 8; i++) {
-// 		digest_32[i] = htonl(ctx->s[i]);
-// 	}
-// }
+std::ostream& operator<<(std::ostream& os, const SHA256State& state)
+{
+	std::ios_base::fmtflags f(os.flags());
+	for (auto i = state.begin(); i != state.end(); i++) {
+                os << std::setfill('0') << std::setw(8) << std::hex << (int)*i;
+        }
+	os.flags(f);
+	return os;
+}

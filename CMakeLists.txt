@@ -38,5 +38,5 @@ endif()
 
 add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
 target_link_libraries(basilisk_hunter cpu_features)
-set(CMAKE_CXX_FLAGS "-std=c++11 -Wall -Wextra -Werror -flto")
+set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -Wall -Wextra -Werror -flto")
 set(CMAKE_EXE_LINKER_FLAGS "-flto")
