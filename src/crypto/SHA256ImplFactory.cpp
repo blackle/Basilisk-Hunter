@@ -5,7 +5,7 @@
 #include "impl/SHA256Impl_AVX1.h"
 #include "impl/SHA256Impl_AVX2.h"
 #include "impl/SHA256Impl_ISHAExt.h"
-#include "impl/SHA256Impl_Arm.h"
+#include "impl/SHA256Impl_ARMv8.h"
 #include <iostream>
 
 template<typename T, SHA256ImplName TName>
@@ -32,7 +32,7 @@ SHA256ImplName SHA256ImplFactory::get_best_impl_name()
 	test_impl<SHA256Impl_AVX1, SHA256ImplName::AVX1>(best_name, best_time);
 	test_impl<SHA256Impl_AVX2, SHA256ImplName::AVX2>(best_name, best_time);
 	test_impl<SHA256Impl_ISHAExt, SHA256ImplName::ISHAExt>(best_name, best_time);
-	test_impl<SHA256Impl_Arm, SHA256ImplName::Arm>(best_name, best_time);
+	test_impl<SHA256Impl_ARMv8, SHA256ImplName::ARMv8>(best_name, best_time);
 
 	return best_name;
 }
@@ -56,8 +56,8 @@ std::unique_ptr<const SHA256Impl> SHA256ImplFactory::get_impl(SHA256ImplName imp
 		case SHA256ImplName::ISHAExt:
 			impl.reset(new SHA256Impl_ISHAExt);
 			break;
-		case SHA256ImplName::Arm:
-			impl.reset(new SHA256Impl_Arm);
+		case SHA256ImplName::ARMv8:
+			impl.reset(new SHA256Impl_ARMv8);
 			break;
 		default:
 			break;

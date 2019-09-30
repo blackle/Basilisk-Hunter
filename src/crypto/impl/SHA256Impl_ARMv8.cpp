@@ -1,4 +1,4 @@
-#include "SHA256Impl_Arm.h"
+#include "SHA256Impl_ARMv8.h"
 #include "bits_arm/sha256-armv8.h"
 
 #if __ARM_ARCH == 8
@@ -11,7 +11,7 @@ static const cpu_features::ArmFeatures features = cpu_features::GetArmInfo().fea
 #endif
 #endif
 
-void SHA256Impl_Arm::calc_block(SHA256State* state, const SHA256Block* block) const
+void SHA256Impl_ARMv8::calc_block(SHA256State* state, const SHA256Block* block) const
 {
 #if __ARM_ARCH == 8
 	sha256_armv8(state->data(), block->data(), 1);
@@ -21,7 +21,7 @@ void SHA256Impl_Arm::calc_block(SHA256State* state, const SHA256Block* block) co
 #endif
 }
 
-bool SHA256Impl_Arm::supported() const
+bool SHA256Impl_ARMv8::supported() const
 {
 #if __ARM_ARCH == 8
 	return features.sha2;
