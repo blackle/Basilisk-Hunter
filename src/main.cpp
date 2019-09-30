@@ -55,7 +55,7 @@ int main(int argc, char** argv)
 	chrono::time_point<chrono::system_clock> stop = chrono::system_clock::now();
 
 	auto time = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
-	std::cout << "time: " << (hashes/(float)time * 1./1000.) << std::endl;
+	std::cout << "MH/s: " << (hashes/(float)time * 1./1000.) << std::endl;
 
 	return 0;
 }
