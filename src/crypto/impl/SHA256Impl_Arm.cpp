@@ -2,8 +2,13 @@
 #include "bits_arm/sha256-armv8.h"
 
 #if __ARM_ARCH == 8
+#if defined(__aarch64__)
+#include "cpuinfo_aarch64.h"
+static const cpu_features::Aarch64Features features = cpu_features::GetAarch64Info().features;
+#else
 #include "cpuinfo_arm.h"
 static const cpu_features::ArmFeatures features = cpu_features::GetArmInfo().features;
+#endif
 #endif
 
 void SHA256Impl_Arm::calc_block(SHA256State* state, const SHA256Block* block) const
