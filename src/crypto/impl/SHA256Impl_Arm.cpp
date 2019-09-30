@@ -3,7 +3,7 @@
 
 #if __ARM_ARCH == 8
 #include "cpuinfo_arm.h"
-static const ArmFeatures features = GetArmInfo().features;
+static const cpu_features::ArmFeatures features = cpu_features::GetArmInfo().features;
 #endif
 
 void SHA256Impl_Arm::calc_block(SHA256State* state, const SHA256Block* block) const
