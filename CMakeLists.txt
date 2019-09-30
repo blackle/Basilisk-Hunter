@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
 
@@ -36,7 +36,10 @@ if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "aarch64")
 set(SOURCES "src/crypto/impl/bits_arm/sha256-armv8-aarch64.S" ${SOURCES})
 endif()
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
-target_link_libraries(basilisk_hunter cpu_features)
+target_link_libraries(basilisk_hunter cpu_features Threads::Threads)
 set(CMAKE_CXX_FLAGS "-std=c++11 -O3 -Wall -Wextra -Werror -flto")
 set(CMAKE_EXE_LINKER_FLAGS "-flto")
