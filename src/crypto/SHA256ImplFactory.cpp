@@ -37,30 +37,23 @@ SHA256ImplName SHA256ImplFactory::get_best_impl_name()
 	return best_name;
 }
 
-std::unique_ptr<const SHA256Impl> SHA256ImplFactory::get_impl(SHA256ImplName impl_name)
+const SHA256Impl* SHA256ImplFactory::get_impl(SHA256ImplName impl_name)
 {
-	std::unique_ptr<SHA256Impl> impl;
 	switch (impl_name) {
 		case SHA256ImplName::Naive:
-			impl.reset(new SHA256Impl_Naive);
-			break;
+			return new SHA256Impl_Naive;
 		case SHA256ImplName::SSE4:
-			impl.reset(new SHA256Impl_SSE4);
-			break;
+			return new SHA256Impl_SSE4;
 		case SHA256ImplName::AVX1:
-			impl.reset(new SHA256Impl_AVX1);
-			break;
+			return new SHA256Impl_AVX1;
 		case SHA256ImplName::AVX2:
-			impl.reset(new SHA256Impl_AVX2);
-			break;
+			return new SHA256Impl_AVX2;
 		case SHA256ImplName::ISHAExt:
-			impl.reset(new SHA256Impl_ISHAExt);
-			break;
+			return new SHA256Impl_ISHAExt;
 		case SHA256ImplName::ARMv8:
-			impl.reset(new SHA256Impl_ARMv8);
-			break;
+			return new SHA256Impl_ARMv8;
 		default:
 			break;
 	}
-	return std::move(impl);
+	return nullptr;
 }

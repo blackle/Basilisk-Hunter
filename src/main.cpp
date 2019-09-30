@@ -17,12 +17,14 @@ struct BasiliskJob {
 
 void basilisk_thread(const BasiliskJob& job)
 {
-	auto compressor = SHA256ImplFactory::get_impl(job.impl).release();
+	auto compressor = SHA256ImplFactory::get_impl(job.impl);
 	Basilisk basilisk(compressor, "basilisk|0000000000|", 64);
 
 	for (int i = 0; i < job.hashes; i++) {
 		basilisk.step();
 	}
+
+	delete compressor;
 }
 
 int main(int argc, char** argv)
@@ -35,7 +37,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	int hashes = 100000000;
+	int hashes = 100000;
 	int threads = std::thread::hardware_concurrency();
 	if (threads == 0) {
 		threads = 1;
@@ -51,6 +53,7 @@ int main(int argc, char** argv)
 
 	for (int i = 0; i < threads; i++) {
 		my_threads[i]->join();
+		delete my_threads[i];
 	}
 	chrono::time_point<chrono::system_clock> stop = chrono::system_clock::now();
 
