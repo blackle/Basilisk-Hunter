@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	int hashes = 100000;
+	int hashes = 100000000;
 	int threads = std::thread::hardware_concurrency();
 	if (threads == 0) {
 		threads = 1;
