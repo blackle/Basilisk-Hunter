@@ -170,12 +170,14 @@ int main(int argc, char** argv)
 	}
 
 	SHA256State global_min = DEFAULT_MINIMUM;
+	std::string global_nonce;
 	while (true) {
 		std::this_thread::sleep_for(chrono::seconds(60));
 		float mhs = 0;
-		for (auto i = workers.begin(); i != workers.end(); i++) {
-			std::cout << "fetching!" << std::endl;
-			auto worker = *i;
+		std::cout << "Joining threads..." << std::endl;
+		for (unsigned i = 0; i < workers.size(); i++) {
+			std::cout << "Joining thread " << (i+1) << "/" << workers.size() << std::endl;
+			auto worker = workers[i];
 			worker->suspend();
 			std::lock_guard<std::mutex> lock(worker->mutex_1());
 
@@ -184,12 +186,12 @@ int main(int argc, char** argv)
 			mhs += (worker->hashes()/seconds)/1000000.0;
 			if (worker->minimum() < global_min) {
 				global_min = worker->minimum();
+				global_nonce = worker->nonce();
 			}
 			worker->resume();
-			std::cout << "fetched!" << std::endl;
 		}
 		std::cout << "MH/s: " << mhs << std::endl;
-		std::cout << "min: " << global_min << std::endl;
+		std::cout << "min: " << global_nonce << " " << global_min << std::endl;
 	}
 
 	return 0;

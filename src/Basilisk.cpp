@@ -49,7 +49,7 @@ std::string Basilisk::challenge()
 std::string Basilisk::nonce()
 {
 	auto c = challenge();
-	return c.substr(c.length() - m_nonce_length - 1, m_nonce_length);
+	return c.substr(c.length() - m_nonce_length, m_nonce_length);
 }
 
 std::string Basilisk::prefix()
