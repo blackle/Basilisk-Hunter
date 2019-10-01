@@ -6,22 +6,93 @@
 #include <thread>
 #include <vector>
 #include "NonceUtil.h"
+#include <mutex>
+#include <memory>
 
 namespace chrono = std::chrono;
 
+static const SHA256State DEFAULT_MINIMUM({
+	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
+});
+static constexpr int BATCH_LENGTH = 10000000;
+
 struct BasiliskJob {
-	BasiliskJob(int h, SHA256ImplName i) : hashes(h), impl(i) {}
+	BasiliskJob(SHA256ImplName i) : hashes(0), impl(i) {}
 	int hashes;
 	SHA256ImplName impl;
+};
+
+class BasiliskWorker {
+public:
+	BasiliskWorker(SHA256ImplName implName, const std::string& prefix, int nonce_length)
+		: m_hashes(0)
+		, m_minimum(DEFAULT_MINIMUM)
+	{
+		m_sha.reset(SHA256ImplFactory::get_impl(implName));
+		m_basilisk.reset(new Basilisk(m_sha.get(), prefix, nonce_length));
+	}
+
+	int hashes() const {
+		return m_hashes;
+	}
+
+	std::mutex& mutex() {
+		return m_mutex;
+	}
+
+	std::string nonce() const {
+		return m_nonce;
+	}
+
+	const SHA256State& minimum() const {
+		return m_minimum;
+	}
+
+	void setThread(std::thread* thread) {
+		m_thread.reset(thread);
+	}
+
+	std::shared_ptr<std::thread> thread() {
+		return m_thread;
+	}
+
+	void do_batch() {
+		for (int i = 0; i < BATCH_LENGTH; i++) {
+			m_basilisk->step();
+			m_hashes++;
+
+			if (m_basilisk->final_state() < m_minimum) {
+				m_minimum = m_basilisk->final_state();
+				m_nonce = m_basilisk->nonce();
+			}
+		}
+	}
+
+private:
+
+	int m_hashes;
+	std::shared_ptr<const SHA256Impl> m_sha;
+	std::shared_ptr<Basilisk> m_basilisk;
+
+	SHA256State m_minimum;
+	std::string m_nonce;
+
+	std::mutex m_mutex;
+	std::shared_ptr<std::thread> m_thread;
 };
 
 void basilisk_thread(const BasiliskJob& job)
 {
 	auto compressor = SHA256ImplFactory::get_impl(job.impl);
-	Basilisk basilisk(compressor, "basilisk|0000000000|", 64);
+	Basilisk basilisk(compressor, "basilisk:0000000000:", 64);
+	SHA256State minimum(DEFAULT_MINIMUM);
 
-	for (int i = 0; i < job.hashes; i++) {
+	while (true) {
 		basilisk.step();
+		if (basilisk.final_state() < minimum) {
+			minimum = basilisk.final_state();
+		}
 	}
 
 	delete compressor;
@@ -37,28 +108,56 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	int hashes = 100000000;
 	int threads = std::thread::hardware_concurrency();
 	if (threads == 0) {
 		threads = 1;
 	}
-	BasiliskJob job(hashes/threads, best);
-	std::cout << "computing " << hashes << " hashes on " << threads << " threads" << std::endl;
+	std::cout << "spinning up " << threads << " threads!" << std::endl;
 
-	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
-	std::vector<std::thread*> my_threads;
+	//todo: make worker pool to encapsulate this behaviour
+	std::vector<BasiliskWorker*> workers;
 	for (int i = 0; i < threads; i++) {
-		my_threads.push_back(new std::thread(basilisk_thread, std::ref(job)));
+		//wrap parameters to BasiliskWorker in a ChallengeCampaign or something so it can be passed around
+		auto worker = new BasiliskWorker(best, "basilisk:0000000000:", 64);
+		workers.push_back(worker);
+		worker->mutex().lock();
+		worker->setThread(new std::thread([worker] {
+			while (true) {
+				{
+					std::lock_guard<std::mutex> lock(worker->mutex());
+					worker->do_batch();
+				}
+				std::this_thread::sleep_for(chrono::nanoseconds(1)); //agressively reschedule
+				//todo: make a "priority mutex" using a condition variable and a mutex (i.e. if the 'priority' thread wants the lock, it will get it as soon as it can)
+			}
+		}));
 	}
 
-	for (int i = 0; i < threads; i++) {
-		my_threads[i]->join();
-		delete my_threads[i];
+	auto start = chrono::system_clock::now();
+	//worker pool start?
+	for (auto i = workers.begin(); i != workers.end(); i++) {
+		auto worker = *i;
+		worker->mutex().unlock();
 	}
-	chrono::time_point<chrono::system_clock> stop = chrono::system_clock::now();
 
-	auto time = chrono::duration_cast<chrono::milliseconds>(stop - start).count();
-	std::cout << "MH/s: " << (hashes/(float)time * 1./1000.) << std::endl;
+	SHA256State global_min = DEFAULT_MINIMUM;
+	while (true) {
+		std::this_thread::sleep_for(chrono::minutes(1));
+		float mhs = 0;
+		for (auto i = workers.begin(); i != workers.end(); i++) {
+			auto worker = *i;
+			std::lock_guard<std::mutex> lock(worker->mutex());
+
+			auto end = chrono::system_clock::now();
+			auto seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1000.0;
+			mhs += (worker->hashes()/seconds)/1000000.0;
+			if (worker->minimum() < global_min) {
+				global_min = worker->minimum();
+			}
+		}
+		std::cout << "MH/s: " << mhs << std::endl;
+		std::cout << "min: " << global_min << std::endl;
+	}
 
 	return 0;
 }

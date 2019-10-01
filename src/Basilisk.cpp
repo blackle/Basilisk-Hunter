@@ -5,6 +5,7 @@ constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
 
 Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned nonce_length)
 	: m_sha(sha)
+	, m_nonce_length(nonce_length)
 {
 	m_challenge = prefix + NonceUtil::build(nonce_length);
 
@@ -45,12 +46,24 @@ std::string Basilisk::challenge()
 	return m_challenge;
 }
 
+std::string Basilisk::nonce()
+{
+	auto c = challenge();
+	return c.substr(c.length() - m_nonce_length - 1, m_nonce_length);
+}
+
+std::string Basilisk::prefix()
+{
+	auto c = challenge();
+	return c.substr(0, c.length() - m_nonce_length);
+}
+
 void Basilisk::digest(SHA256Digest* digest) const
 {
 	m_ctx_final.digest(digest);
 }
 
-bool Basilisk::compare(uint32_t val) const
+const SHA256State& Basilisk::final_state() const
 {
-	return m_ctx_final[0] < val;
+	return m_ctx_final;
 }
