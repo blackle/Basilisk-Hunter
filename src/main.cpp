@@ -37,8 +37,12 @@ public:
 		return m_hashes;
 	}
 
-	std::mutex& mutex() {
-		return m_mutex;
+	std::mutex& mutex_1() {
+		return m_mutex_1;
+	}
+
+	std::mutex& mutex_2() {
+		return m_mutex_2;
 	}
 
 	std::string nonce() const {
@@ -78,7 +82,8 @@ private:
 	SHA256State m_minimum;
 	std::string m_nonce;
 
-	std::mutex m_mutex;
+	std::mutex m_mutex_1;
+	std::mutex m_mutex_2;
 	std::shared_ptr<std::thread> m_thread;
 };
 
@@ -108,8 +113,8 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	int threads = std::thread::hardware_concurrency();
-	if (threads == 0) {
+	int threads = 2;// std::thread::hardware_concurrency();
+	if (threads <= 0) {
 		threads = 1;
 	}
 	std::cout << "spinning up " << threads << " threads!" << std::endl;
@@ -120,14 +125,17 @@ int main(int argc, char** argv)
 		//wrap parameters to BasiliskWorker in a ChallengeCampaign or something so it can be passed around
 		auto worker = new BasiliskWorker(best, "basilisk:0000000000:", 64);
 		workers.push_back(worker);
-		worker->mutex().lock();
+		worker->mutex_2().lock();
 		worker->setThread(new std::thread([worker] {
 			while (true) {
 				{
-					std::lock_guard<std::mutex> lock(worker->mutex());
+					worker->mutex_2().lock();
+					std::lock_guard<std::mutex> lock(worker->mutex_1());
+					worker->mutex_2().unlock();
 					worker->do_batch();
+					//todo: maybe join data in this thread?
 				}
-				std::this_thread::sleep_for(chrono::nanoseconds(1)); //agressively reschedule
+				// std::this_thread::sleep_for(chrono::nanoseconds(1)); //agressively reschedule
 				//todo: make a "priority mutex" using a condition variable and a mutex (i.e. if the 'priority' thread wants the lock, it will get it as soon as it can)
 			}
 		}));
@@ -137,7 +145,7 @@ int main(int argc, char** argv)
 	//worker pool start?
 	for (auto i = workers.begin(); i != workers.end(); i++) {
 		auto worker = *i;
-		worker->mutex().unlock();
+		worker->mutex_2().unlock();
 	}
 
 	SHA256State global_min = DEFAULT_MINIMUM;
@@ -146,7 +154,9 @@ int main(int argc, char** argv)
 		float mhs = 0;
 		for (auto i = workers.begin(); i != workers.end(); i++) {
 			auto worker = *i;
-			std::lock_guard<std::mutex> lock(worker->mutex());
+			worker->mutex_2().lock();
+			std::lock_guard<std::mutex> lock(worker->mutex_1());
+			worker->mutex_2().unlock();
 
 			auto end = chrono::system_clock::now();
 			auto seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1000.0;
