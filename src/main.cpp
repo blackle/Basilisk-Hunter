@@ -9,6 +9,7 @@
 #include <mutex>
 #include <memory>
 #include <condition_variable>
+#include <atomic>
 
 namespace chrono = std::chrono;
 
@@ -16,7 +17,7 @@ static const SHA256State DEFAULT_MINIMUM({
 	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
 	0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF, 0xFFFFFFFF,
 });
-static constexpr int BATCH_LENGTH = 10000000;
+static constexpr unsigned BATCH_LENGTH = 100000;
 
 struct BasiliskJob {
 	BasiliskJob(SHA256ImplName i) : hashes(0), impl(i) {}
@@ -24,53 +25,68 @@ struct BasiliskJob {
 	SHA256ImplName impl;
 };
 
+class BasiliskWinner {
+public:
+	BasiliskWinner() : m_minimum(DEFAULT_MINIMUM), m_dirty(false) {}
+
+	void ingest(SHA256State& minimum, const std::string& nonce) {
+		if (minimum < m_minimum) {
+			m_minimum = minimum;
+			m_nonce = nonce;
+			m_dirty = true;
+		} else {
+			minimum = m_minimum;
+		}
+	}
+
+	std::mutex& mutex() {
+		return m_mutex;
+	}
+
+	bool is_dirty() const {
+		return m_dirty;
+	}
+
+	void clear_dirty() {
+		m_dirty = false;
+	}
+
+	const SHA256State& minimum() const {
+		return m_minimum;
+	}
+
+	const std::string& nonce() const {
+		return m_nonce;
+	}
+
+private:
+	SHA256State m_minimum;
+	std::string m_nonce;
+	std::mutex m_mutex;
+	bool m_dirty;
+};
+
 class BasiliskWorker {
 public:
-	BasiliskWorker(SHA256ImplName implName, const std::string& prefix, int nonce_length)
-		: m_hashes(0)
-		, m_minimum(DEFAULT_MINIMUM)
-		, m_suspended(false)
+	BasiliskWorker(SHA256ImplName implName, const std::string& prefix, int nonce_length, BasiliskWinner* winner)
+		: m_batches(0)
+		, m_minimum(winner->minimum())
+		, m_winner(winner)
 	{
 		m_sha.reset(SHA256ImplFactory::get_impl(implName));
 		m_basilisk.reset(new Basilisk(m_sha.get(), prefix, nonce_length));
 	}
 
-	int hashes() const {
-		return m_hashes;
+	unsigned batches() const {
+		return m_batches.load();
 	}
 
-	std::mutex& mutex_1() {
-		return m_mutex_1;
+	unsigned batch_size() const {
+		return BATCH_LENGTH;
 	}
 
-	std::mutex& mutex_2() {
-		return m_mutex_2;
-	}
-
-	std::condition_variable& cv() {
-		return m_cv;
-	}
-
-	bool is_suspended() const {
-		return m_suspended;
-	}
-
-	void suspend() {
-		m_suspended = true;
-		m_cv.notify_one();
-	}
-
-	void resume() {
-		m_suspended = false;
-		m_cv.notify_one();
-	}
-
-	std::string nonce() const {
-		return m_nonce;
-	}
-
-	const SHA256State& minimum() const {
-		return m_minimum;
+	std::mutex& mutex() {
+		return m_mutex;
 	}
 
 	void setThread(std::thread* thread) {
@@ -81,32 +97,32 @@ public:
 		return m_thread;
 	}
 
-	void do_batch() {
-		for (int i = 0; i < BATCH_LENGTH; i++) {
+	void do_batch() { //todo: hide in private and use friends to let the thread run it
+		for (unsigned i = 0; i < BATCH_LENGTH; i++) {
 			m_basilisk->step();
-			m_hashes++;
 
 			if (m_basilisk->final_state() < m_minimum) {
+				//todo: lock in here???
 				m_minimum = m_basilisk->final_state();
-				m_nonce = m_basilisk->nonce();
+				std::lock_guard<std::mutex> lock(m_winner->mutex());
+				m_winner->ingest(m_minimum, m_basilisk->nonce());
 			}
 		}
+		m_batches++;
 	}
 
 private:
 
-	int m_hashes;
+	std::atomic_uint m_batches; //store as atomic that is externally accessible?
 	std::shared_ptr<const SHA256Impl> m_sha;
 	std::shared_ptr<Basilisk> m_basilisk;
 
 	SHA256State m_minimum;
-	std::string m_nonce;
 
-	std::mutex m_mutex_1;
-	std::mutex m_mutex_2;
-	std::condition_variable m_cv;
-	bool m_suspended;
+	std::mutex m_mutex;
 	std::shared_ptr<std::thread> m_thread;
+
+	BasiliskWinner* m_winner;
 };
 
 void basilisk_thread(const BasiliskJob& job)
@@ -141,23 +157,18 @@ int main(int argc, char** argv)
 	}
 	std::cout << "spinning up " << threads << " threads!" << std::endl;
 
+	BasiliskWinner winner; //todo: initialize with data from server
+
 	//todo: make worker pool to encapsulate this behaviour
 	std::vector<BasiliskWorker*> workers;
 	for (int i = 0; i < threads; i++) {
 		//wrap parameters to BasiliskWorker in a ChallengeCampaign or something so it can be passed around
-		auto worker = new BasiliskWorker(best, "basilisk:0000000000:", 64);
+		auto worker = new BasiliskWorker(best, "basilisk:0000000000:", 64, &winner);
 		workers.push_back(worker);
-		worker->mutex_2().lock();
+		worker->mutex().lock();
 		worker->setThread(new std::thread([worker] {
 			while (true) {
-				{
-					std::unique_lock<std::mutex> lock(worker->mutex_1());
-					worker->cv().wait(lock, [&worker] { return !worker->is_suspended(); });
-					worker->do_batch();
-					//todo: maybe join data in this thread?
-				}
-				// std::this_thread::sleep_for(chrono::nanoseconds(1)); //agressively reschedule
-				//todo: make a "priority mutex" using a condition variable and a mutex (i.e. if the 'priority' thread wants the lock, it will get it as soon as it can)
+				worker->do_batch();
 			}
 		}));
 	}
@@ -166,32 +177,27 @@ int main(int argc, char** argv)
 	//worker pool start?
 	for (auto i = workers.begin(); i != workers.end(); i++) {
 		auto worker = *i;
-		worker->mutex_2().unlock();
+		worker->mutex().unlock();
 	}
 
-	SHA256State global_min = DEFAULT_MINIMUM;
-	std::string global_nonce;
 	while (true) {
-		std::this_thread::sleep_for(chrono::seconds(60));
+		std::this_thread::sleep_for(chrono::seconds(10));
 		float mhs = 0;
-		std::cout << "Joining threads..." << std::endl;
 		for (unsigned i = 0; i < workers.size(); i++) {
-			std::cout << "Joining thread " << (i+1) << "/" << workers.size() << std::endl;
 			auto worker = workers[i];
-			worker->suspend();
-			std::lock_guard<std::mutex> lock(worker->mutex_1());
 
 			auto end = chrono::system_clock::now();
-			auto seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1000.0;
-			mhs += (worker->hashes()/seconds)/1000000.0;
-			if (worker->minimum() < global_min) {
-				global_min = worker->minimum();
-				global_nonce = worker->nonce();
-			}
-			worker->resume();
+			float ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+			mhs += (worker->batches()/ms)/1000.0 * worker->batch_size(); //todo: change this from cumulative average to moving average
 		}
 		std::cout << "MH/s: " << mhs << std::endl;
-		std::cout << "min: " << global_nonce << " " << global_min << std::endl;
+
+		std::lock_guard<std::mutex> lock(winner.mutex());
+		if (winner.is_dirty()) {
+			winner.clear_dirty();
+			std::cout << "New lowest nonce found:" << std::endl;
+			std::cout << winner.nonce() << " " << winner.minimum() << std::endl;
+		}
 	}
 
 	return 0;
