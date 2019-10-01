@@ -8,6 +8,7 @@
 #include "NonceUtil.h"
 #include <mutex>
 #include <memory>
+#include <condition_variable>
 
 namespace chrono = std::chrono;
 
@@ -28,6 +29,7 @@ public:
 	BasiliskWorker(SHA256ImplName implName, const std::string& prefix, int nonce_length)
 		: m_hashes(0)
 		, m_minimum(DEFAULT_MINIMUM)
+		, m_suspended(false)
 	{
 		m_sha.reset(SHA256ImplFactory::get_impl(implName));
 		m_basilisk.reset(new Basilisk(m_sha.get(), prefix, nonce_length));
@@ -43,6 +45,24 @@ public:
 
 	std::mutex& mutex_2() {
 		return m_mutex_2;
+	}
+
+	std::condition_variable& cv() {
+		return m_cv;
+	}
+
+	bool is_suspended() const {
+		return m_suspended;
+	}
+
+	void suspend() {
+		m_suspended = true;
+		m_cv.notify_one();
+	}
+
+	void resume() {
+		m_suspended = false;
+		m_cv.notify_one();
 	}
 
 	std::string nonce() const {
@@ -84,6 +104,8 @@ private:
 
 	std::mutex m_mutex_1;
 	std::mutex m_mutex_2;
+	std::condition_variable m_cv;
+	bool m_suspended;
 	std::shared_ptr<std::thread> m_thread;
 };
 
@@ -113,7 +135,7 @@ int main(int argc, char** argv)
 		return -1;
 	}
 
-	int threads = 2;// std::thread::hardware_concurrency();
+	int threads = std::thread::hardware_concurrency();
 	if (threads <= 0) {
 		threads = 1;
 	}
@@ -129,9 +151,8 @@ int main(int argc, char** argv)
 		worker->setThread(new std::thread([worker] {
 			while (true) {
 				{
-					worker->mutex_2().lock();
-					std::lock_guard<std::mutex> lock(worker->mutex_1());
-					worker->mutex_2().unlock();
+					std::unique_lock<std::mutex> lock(worker->mutex_1());
+					worker->cv().wait(lock, [&worker] { return !worker->is_suspended(); });
 					worker->do_batch();
 					//todo: maybe join data in this thread?
 				}
@@ -150,13 +171,13 @@ int main(int argc, char** argv)
 
 	SHA256State global_min = DEFAULT_MINIMUM;
 	while (true) {
-		std::this_thread::sleep_for(chrono::minutes(1));
+		std::this_thread::sleep_for(chrono::seconds(60));
 		float mhs = 0;
 		for (auto i = workers.begin(); i != workers.end(); i++) {
+			std::cout << "fetching!" << std::endl;
 			auto worker = *i;
-			worker->mutex_2().lock();
+			worker->suspend();
 			std::lock_guard<std::mutex> lock(worker->mutex_1());
-			worker->mutex_2().unlock();
 
 			auto end = chrono::system_clock::now();
 			auto seconds = chrono::duration_cast<chrono::milliseconds>(end - start).count() / 1000.0;
@@ -164,6 +185,8 @@ int main(int argc, char** argv)
 			if (worker->minimum() < global_min) {
 				global_min = worker->minimum();
 			}
+			worker->resume();
+			std::cout << "fetched!" << std::endl;
 		}
 		std::cout << "MH/s: " << mhs << std::endl;
 		std::cout << "min: " << global_min << std::endl;
