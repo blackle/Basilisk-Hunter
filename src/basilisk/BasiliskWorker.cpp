@@ -4,12 +4,12 @@
 
 static constexpr unsigned BATCH_SIZE = 100000;
 
-BasiliskWorker::BasiliskWorker(SHA256ImplName implName, const std::string& prefix, int nonce_length, BasiliskWinner* winner)
+BasiliskWorker::BasiliskWorker(const std::string& impl_name, const std::string& prefix, int nonce_length, BasiliskWinner* winner)
 	: m_batches(0)
 	, m_minimum(winner->minimum())
 	, m_winner(winner)
 {
-	m_sha.reset(SHA256ImplFactory::get_impl(implName));
+	m_sha.reset(SHA256ImplFactory::get_impl(impl_name));
 	m_basilisk.reset(new Basilisk(m_sha.get(), prefix, nonce_length));
 }
 
@@ -38,7 +38,6 @@ void BasiliskWorker::do_batch() {
 		m_basilisk->step();
 
 		if (m_basilisk->final_state() < m_minimum) {
-			//todo: lock in here???
 			m_minimum = m_basilisk->final_state();
 			std::lock_guard<std::mutex> lock(m_winner->mutex());
 			m_winner->ingest(m_minimum, m_basilisk->nonce());

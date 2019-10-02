@@ -24,3 +24,8 @@ bool SHA256Impl_ISHAExt::supported() const
 	return false;
 #endif
 }
+
+std::string SHA256Impl_ISHAExt::name()
+{
+	return "ISHAExt";
+}

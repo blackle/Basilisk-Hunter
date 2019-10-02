@@ -12,7 +12,7 @@ class Basilisk;
 
 class BasiliskWorker {
 public:
-	BasiliskWorker(SHA256ImplName implName, const std::string& prefix, int nonce_length, BasiliskWinner* winner);
+	BasiliskWorker(const std::string& impl_name, const std::string& prefix, int nonce_length, BasiliskWinner* winner);
 
 	unsigned batches() const;
 	static unsigned batch_size();
@@ -25,7 +25,7 @@ public:
 
 private:
 
-	std::atomic_uint m_batches; //store as atomic that is externally accessible?
+	std::atomic_uint m_batches;
 	std::shared_ptr<const SHA256Impl> m_sha;
 	std::shared_ptr<Basilisk> m_basilisk;
 

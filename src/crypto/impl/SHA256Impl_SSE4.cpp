@@ -24,3 +24,8 @@ bool SHA256Impl_SSE4::supported() const
 	return false;
 #endif
 }
+
+std::string SHA256Impl_SSE4::name()
+{
+	return "SSE4";
+}

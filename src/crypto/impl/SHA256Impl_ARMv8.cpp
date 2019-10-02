@@ -29,3 +29,8 @@ bool SHA256Impl_ARMv8::supported() const
 	return false;
 #endif
 }
+
+std::string SHA256Impl_ARMv8::name()
+{
+	return "ARMv8";
+}

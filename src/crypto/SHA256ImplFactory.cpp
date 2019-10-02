@@ -8,52 +8,51 @@
 #include "impl/SHA256Impl_ARMv8.h"
 #include <iostream>
 
-template<typename T, SHA256ImplName TName>
-static void test_impl(SHA256ImplName& best_name, int& best_time)
+template<typename T>
+static void test_impl(std::string& best_name, int& best_time)
 {
 	T impl;
 	if (impl.supported() && SHA256Tester::verify(&impl)) {
 		auto benchmark = SHA256Tester::benchmark(&impl);
-		std::cout << (int)TName << " " << benchmark << std::endl;
+		std::cout << T::name() << " " << benchmark << std::endl;
 		if (benchmark < best_time || best_time < 0) {
-			best_name = TName;
+			best_name = T::name();
 			best_time = benchmark;
 		}
 	}
 }
 
-SHA256ImplName SHA256ImplFactory::get_best_impl_name()
+std::string SHA256ImplFactory::get_best_impl_name()
 {
-	auto best_name = SHA256ImplName::None;
+	std::string best_name;
 	int best_time = -1;
 
-	test_impl<SHA256Impl_Naive, SHA256ImplName::Naive>(best_name, best_time);
-	test_impl<SHA256Impl_SSE4, SHA256ImplName::SSE4>(best_name, best_time);
-	test_impl<SHA256Impl_AVX1, SHA256ImplName::AVX1>(best_name, best_time);
-	test_impl<SHA256Impl_AVX2, SHA256ImplName::AVX2>(best_name, best_time);
-	test_impl<SHA256Impl_ISHAExt, SHA256ImplName::ISHAExt>(best_name, best_time);
-	test_impl<SHA256Impl_ARMv8, SHA256ImplName::ARMv8>(best_name, best_time);
+	test_impl<SHA256Impl_Naive>    (best_name, best_time);
+	test_impl<SHA256Impl_SSE4>     (best_name, best_time);
+	test_impl<SHA256Impl_AVX1>     (best_name, best_time);
+	test_impl<SHA256Impl_AVX2>     (best_name, best_time);
+	test_impl<SHA256Impl_ISHAExt>  (best_name, best_time);
+	test_impl<SHA256Impl_ARMv8>    (best_name, best_time);
 
 	return best_name;
 }
 
-const SHA256Impl* SHA256ImplFactory::get_impl(SHA256ImplName impl_name)
+template<typename T>
+static void set_impl(SHA256Impl*& impl, const std::string& impl_name)
 {
-	switch (impl_name) {
-		case SHA256ImplName::Naive:
-			return new SHA256Impl_Naive;
-		case SHA256ImplName::SSE4:
-			return new SHA256Impl_SSE4;
-		case SHA256ImplName::AVX1:
-			return new SHA256Impl_AVX1;
-		case SHA256ImplName::AVX2:
-			return new SHA256Impl_AVX2;
-		case SHA256ImplName::ISHAExt:
-			return new SHA256Impl_ISHAExt;
-		case SHA256ImplName::ARMv8:
-			return new SHA256Impl_ARMv8;
-		default:
-			break;
+	if (T::name() == impl_name) {
+		impl = new T;
 	}
-	return nullptr;
+}
+
+const SHA256Impl* SHA256ImplFactory::get_impl(const std::string& impl_name)
+{
+	SHA256Impl* impl = nullptr;
+	set_impl<SHA256Impl_Naive>   (impl, impl_name);
+	set_impl<SHA256Impl_SSE4>    (impl, impl_name);
+	set_impl<SHA256Impl_AVX1>    (impl, impl_name);
+	set_impl<SHA256Impl_AVX2>    (impl, impl_name);
+	set_impl<SHA256Impl_ISHAExt> (impl, impl_name);
+	set_impl<SHA256Impl_ARMv8>   (impl, impl_name);
+	return impl;
 }

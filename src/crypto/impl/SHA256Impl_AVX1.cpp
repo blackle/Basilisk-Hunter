@@ -24,3 +24,8 @@ bool SHA256Impl_AVX1::supported() const
 	return false;
 #endif
 }
+
+std::string SHA256Impl_AVX1::name()
+{
+	return "AVX1";
+}

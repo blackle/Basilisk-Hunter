@@ -19,7 +19,7 @@ int main(int argc, char** argv)
 	(void)argv;
 
 	auto best = SHA256ImplFactory::get_best_impl_name();
-	if (best == SHA256ImplName::None) {
+	if (best.empty()) {
 		return -1;
 	}
 

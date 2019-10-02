@@ -64,3 +64,8 @@ bool SHA256Impl_Naive::supported() const
 {
 	return true;
 }
+
+std::string SHA256Impl_Naive::name()
+{
+	return "naive";
+}
