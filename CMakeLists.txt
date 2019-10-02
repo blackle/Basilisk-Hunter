@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.1)
 project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
 
+set(BUILD_CPR_TESTS OFF)
+add_subdirectory(cpr)
+include_directories(${CPR_INCLUDE_DIRS})
+
 message(${CMAKE_SYSTEM_PROCESSOR})
 
 include_directories(src)
@@ -41,6 +45,8 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_STANDARD 11)
 
 add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
+target_link_libraries(basilisk_hunter Threads::Threads)
 target_link_libraries(basilisk_hunter cpu_features Threads::Threads)
+target_link_libraries(basilisk_hunter ${CPR_LIBRARIES})
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -flto")
 set(CMAKE_EXE_LINKER_FLAGS "-flto")

@@ -67,6 +67,7 @@ int main(int argc, char** argv)
 		std::lock_guard<std::mutex> lock(winner.mutex());
 		if (winner.is_dirty()) {
 			winner.clear_dirty();
+			//todo: send to server
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << winner.nonce() << " " << winner.minimum() << std::endl;
 		}
