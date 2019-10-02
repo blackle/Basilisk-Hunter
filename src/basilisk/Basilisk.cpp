@@ -1,5 +1,5 @@
 #include "Basilisk.h"
-#include "NonceUtil.h"
+#include <crypto/NonceUtil.h>
 
 constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
 
