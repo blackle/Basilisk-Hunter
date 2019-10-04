@@ -27,15 +27,15 @@ int main(int argc, char** argv)
 	}
 	std::cout << "spinning up " << threads << " threads!" << std::endl;
 
-	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize with data from server
+	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 
 	WorkerPool workers(&challenge, best, 100000, threads);
 
 	workers.resume();
 
-	unsigned batches = workers.batches_computed();
+	unsigned batches = workers.batches_computed(); //todo: incorporate hash rate counting into its own class
 	while (true) {
-		auto start = chrono::system_clock::now();
+		auto start = chrono::system_clock::now(); //todo: make a utility "elapsed timer" class
 
 		std::this_thread::sleep_for(chrono::seconds(5));
 
