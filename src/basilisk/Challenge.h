@@ -2,6 +2,7 @@
 
 #include <crypto/SHA256State.h>
 #include <mutex>
+#include <atomic>
 
 class Challenge {
 public:
@@ -21,7 +22,7 @@ public:
 private:
 	SHA256State m_hash;
 	std::string m_nonce;
-	bool m_dirty;
+	std::atomic_bool m_dirty;
 
 	const std::string m_prefix;
 	const unsigned m_nonce_length;

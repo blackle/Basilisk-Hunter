@@ -13,7 +13,7 @@ namespace chrono = std::chrono;
 
 int main(int argc, char** argv)
 {
-	(void)argc;
+	(void)argc; //todo: add cli args
 	(void)argv;
 
 	auto best = SHA256ImplFactory::get_best_impl_name();
@@ -30,14 +30,13 @@ int main(int argc, char** argv)
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 
 	WorkerPool workers(&challenge, best, 100000, threads);
-
-	workers.resume();
+	workers.resume(); //todo: decide why we should even bother with this
 
 	unsigned batches = workers.batches_computed(); //todo: incorporate hash rate counting into its own class
 	while (true) {
 		auto start = chrono::system_clock::now(); //todo: make a utility "elapsed timer" class
 
-		std::this_thread::sleep_for(chrono::seconds(5));
+		std::this_thread::sleep_for(chrono::seconds(10));
 
 		unsigned new_batches = workers.batches_computed();
 		auto end = chrono::system_clock::now();
@@ -46,10 +45,10 @@ int main(int argc, char** argv)
 		float mhs = (new_batches-batches)/(ms*1000.0) * workers.batch_size();
 		std::cout << "MH/s: " << mhs << std::endl;
 
-		std::lock_guard<std::mutex> lock(challenge.mutex());
 		if (challenge.is_dirty()) {
 			challenge.clear_dirty();
 			//todo: send to server
+			std::lock_guard<std::mutex> lock(challenge.mutex());
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << challenge.best_nonce() << " " << challenge.best_hash() << std::endl;
 		}

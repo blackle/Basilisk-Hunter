@@ -20,9 +20,10 @@ public:
 	void setThread(std::thread* thread);
 	std::shared_ptr<std::thread> thread();
 
+private:
+	friend class WorkerPool;
 	void do_batch();
 
-private:
 	const unsigned m_batch_size;
 	std::atomic_uint m_batches;
 	std::shared_ptr<const SHA256Impl> m_sha;

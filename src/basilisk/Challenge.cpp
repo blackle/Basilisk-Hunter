@@ -39,7 +39,7 @@ const std::string& Challenge::best_nonce() const {
 }
 
 bool Challenge::is_dirty() const {
-	return m_dirty;
+	return m_dirty.load();
 }
 
 void Challenge::clear_dirty() {
