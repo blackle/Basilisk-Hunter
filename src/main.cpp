@@ -1,65 +1,54 @@
 #include <crypto/SHA256ImplFactory.h>
 #include <crypto/SHA256State.h>
-#include <basilisk/Basilisk.h>
 #include <basilisk/Challenge.h>
 #include <basilisk/WorkerPool.h>
+#include <basilisk/Configuration.h>
 #include <basilisk/HashSpeedometer.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
 #include <vector>
 #include <array_ios.h>
-#include <argagg.h>
+#include "ArgumentParser.h"
 
 namespace chrono = std::chrono;
 
 int main(int argc, char** argv)
 {
-	argagg::parser argparser {{
-		{ "help", {"-h", "--help"},
-		  "shows this help message", 0},
-		{ "version", {"-v", "--version"},
-		  "shows the program version string", 0},
-		{ "name", {"--name"},
-		  "sets your name for the leaderboard (utf-8)", 1},
-		{ "threads", {"--threads"},
-		  "sets the number of threads to run (default 1)", 1},
-		{ "impl", {"--impl"},
-		  "sets the sha256 compression function implementation", 1},
-		{ "get-impl", {"--get-impls"},
-		  "lists the supported sha256 compression function implementations", 0},
-	}};
-
-	argagg::parser_results args;
+	ArgumentParser parser;
+	Configuration* config; //todo: put in unique_ptr
 	try {
-		args = argparser.parse(argc, argv);
+		config = parser.parse(argc, argv);
 	} catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return EXIT_FAILURE;
 	}
-
-	if (args["help"]) {
-		std::cerr << "usage: " << argv[0] << " [OPTIONS]..." << std::endl;
-		std::cerr << "A networked program to search for strings that hash to small values." << std::endl;
-		std::cerr << std::endl;
-		std::cerr << "Options:" << std::endl;
-		std::cerr << argparser;
+	if (config == nullptr) {
 		return EXIT_SUCCESS;
 	}
 
-	auto best = SHA256ImplFactory::get_best_impl_name();
-	if (best.empty()) {
-		std::cerr << "No available implementations (this is a bug, please report me)" << std::endl;
-		return EXIT_FAILURE;
+	if (config->impl().empty()) {
+		std::cout << "No implementation chosen, running tests to automatically pick the best one..." << std::endl;
+		config->setImpl(SHA256ImplFactory::get_best_impl_name());
+		if (config->impl().empty()) {
+			std::cerr << "No available implementations! (this is a bug, please report me)" << std::endl;
+			return EXIT_FAILURE;
+		}
+	} else {
+		auto test_impl = SHA256ImplFactory::get_impl(config->impl());
+		if (test_impl == nullptr || !test_impl->supported()) {
+			std::cerr << "The implementation \"" << config->impl() << "\" does not exist or is unsupported." << std::endl;
+			return EXIT_FAILURE;
+		}
+		delete test_impl;
 	}
-	std::cout << "Using implementation \"" << best << "\"" << std::endl;
 
-	unsigned threads = args["threads"].as<unsigned>(1);
-	std::cout << "spinning up " << threads << " threads!" << std::endl;
+	std::cout << "Using implementation \"" << config->impl() << "\"" << std::endl;
+	std::cout << "Spinning up " << config->threads() << " threads!" << std::endl;
 
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 
-	WorkerPool workers(&challenge, best, threads);
+	WorkerPool workers(&challenge, config->impl(), config->threads());
 	HashSpeedometer speedometer(&workers);
 
 	while (true) {
