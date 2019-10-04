@@ -11,9 +11,6 @@ public:
 	WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned batch_size, unsigned count);
 	~WorkerPool();
 
-	void resume();
-	void pause();
-
 	unsigned batches_computed() const;
 	unsigned batch_size() const;
 

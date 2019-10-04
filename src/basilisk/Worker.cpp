@@ -16,10 +16,6 @@ unsigned Worker::batches() const {
 	return m_batches.load();
 }
 
-std::mutex& Worker::mutex() {
-	return m_mutex;
-}
-
 void Worker::setThread(std::thread* thread) {
 	m_thread.reset(thread);
 }

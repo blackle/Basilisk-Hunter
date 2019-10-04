@@ -1,7 +1,6 @@
 #pragma once
 
 #include <memory>
-#include <mutex>
 #include <atomic>
 #include <thread>
 #include <crypto/SHA256State.h>
@@ -16,7 +15,6 @@ public:
 
 	unsigned batches() const;
 
-	std::mutex& mutex();
 	void setThread(std::thread* thread);
 	std::shared_ptr<std::thread> thread();
 
@@ -30,9 +28,7 @@ private:
 	std::shared_ptr<Basilisk> m_basilisk;
 
 	SHA256State m_hash;
-
-	std::mutex m_mutex;
-	std::shared_ptr<std::thread> m_thread;
-
 	Challenge* m_challenge;
+
+	std::shared_ptr<std::thread> m_thread;
 };
