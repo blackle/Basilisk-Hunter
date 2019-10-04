@@ -1,13 +1,14 @@
 #include "WorkerPool.h"
 #include "Worker.h"
 #include "Challenge.h"
+#include "Configuration.h"
 #include <thread>
 
-WorkerPool::WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned count)
+WorkerPool::WorkerPool(Challenge* challenge, const Configuration* config)
 {
-	for (unsigned i = 0; i < count; i++) {
+	for (unsigned i = 0; i < config->threads(); i++) {
 		//todo: make RateLimitedWorker
-		auto worker = new Worker(impl_name, challenge);
+		auto worker = new Worker(challenge, config);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
 			while (true) {

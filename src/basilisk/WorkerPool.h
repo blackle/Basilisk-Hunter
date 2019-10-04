@@ -6,10 +6,11 @@
 
 class Worker;
 class Challenge;
+class Configuration;
 
 class WorkerPool : public Batcher {
 public:
-	WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned count);
+	WorkerPool(Challenge* challenge, const Configuration* config);
 	~WorkerPool();
 
 	virtual unsigned batches() const override;

@@ -3,9 +3,9 @@
 #include <iostream>
 
 ArgumentParser::ArgumentParser() : m_parser({{
-	{ "help", {"-h", "--help"},
+	{ "help", {"--help"},
 	  "shows this help message", 0},
-	{ "version", {"-v", "--version"},
+	{ "version", {"--version"},
 	  "shows the program version string", 0},
 	{ "name", {"--name"},
 	  "sets your name for the leaderboard (utf-8)", 1},
@@ -13,17 +13,27 @@ ArgumentParser::ArgumentParser() : m_parser({{
 	  "sets the number of threads to run (default 1)", 1},
 	{ "impl", {"--impl"},
 	  "sets the sha256 compression function implementation", 1},
-	{ "get-impl", {"--get-impls"},
+	{ "list-impls", {"--list-impls"},
 	  "lists the supported sha256 compression function implementations", 0},
 }})
 {}
 
-Configuration* ArgumentParser::parse(int argc, char** argv)
+Configuration* ArgumentParser::parse(int argc, char** argv) const
 {
 	argagg::parser_results args = m_parser.parse(argc, argv);
 
 	if (args["help"]) {
 		print_help_message(argv[0]);
+		return nullptr;
+	}
+
+	if (args["version"]) {
+		print_help_message(argv[0]); //todo: print version string
+		return nullptr;
+	}
+
+	if (args["list-impls"]) {
+		print_help_message(argv[0]); //todo: list impls
 		return nullptr;
 	}
 

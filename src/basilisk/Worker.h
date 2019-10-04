@@ -7,11 +7,12 @@
 #include <crypto/SHA256ImplFactory.h>
 
 class Challenge;
+class Configuration;
 class Basilisk;
 
 class Worker {
 public:
-	Worker(const std::string& impl_name, Challenge* winner);
+	Worker(Challenge* winner, const Configuration* config);
 
 	unsigned batches() const;
 	static unsigned batch_size();

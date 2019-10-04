@@ -13,6 +13,7 @@
 
 namespace chrono = std::chrono;
 
+//todo: audit when we print to cout vs cerr, and when we should or shouldn't
 int main(int argc, char** argv)
 {
 	ArgumentParser parser;
@@ -27,6 +28,7 @@ int main(int argc, char** argv)
 		return EXIT_SUCCESS;
 	}
 
+	//todo: make config builder that parses the args and produces a const Configuration*
 	if (config->impl().empty()) {
 		std::cout << "No implementation chosen, running tests to automatically pick the best one..." << std::endl;
 		config->setImpl(SHA256ImplFactory::get_best_impl_name());
@@ -48,7 +50,7 @@ int main(int argc, char** argv)
 
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 
-	WorkerPool workers(&challenge, config->impl(), config->threads());
+	WorkerPool workers(&challenge, config);
 	HashSpeedometer speedometer(&workers);
 
 	while (true) {

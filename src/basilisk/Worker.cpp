@@ -1,15 +1,16 @@
 #include "Worker.h"
 #include "Challenge.h"
+#include "Configuration.h"
 #include "Basilisk.h"
 
 static constexpr unsigned BATCH_SIZE = 100000;
 
-Worker::Worker(const std::string& impl_name, Challenge* challenge)
+Worker::Worker(Challenge* challenge, const Configuration* config)
 	: m_batches(0)
 	, m_hash(challenge->best_hash())
 	, m_challenge(challenge)
 {
-	m_sha.reset(SHA256ImplFactory::get_impl(impl_name));
+	m_sha.reset(SHA256ImplFactory::get_impl(config->impl()));
 	m_basilisk.reset(new Basilisk(m_sha.get(), m_challenge->prefix(), m_challenge->nonce_length()));
 }
 
