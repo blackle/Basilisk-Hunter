@@ -11,9 +11,10 @@ class Basilisk;
 
 class Worker {
 public:
-	Worker(const std::string& impl_name, unsigned batch_size, Challenge* winner);
+	Worker(const std::string& impl_name, Challenge* winner);
 
 	unsigned batches() const;
+	static unsigned batch_size();
 
 	void setThread(std::thread* thread);
 	std::shared_ptr<std::thread> thread();
@@ -22,7 +23,6 @@ private:
 	friend class WorkerPool;
 	void do_batch();
 
-	const unsigned m_batch_size;
 	std::atomic_uint m_batches;
 	std::shared_ptr<const SHA256Impl> m_sha;
 	std::shared_ptr<Basilisk> m_basilisk;

@@ -8,7 +8,7 @@ class Challenge;
 
 class WorkerPool {
 public:
-	WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned batch_size, unsigned count);
+	WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned count);
 	~WorkerPool();
 
 	unsigned batches_computed() const;
@@ -16,5 +16,4 @@ public:
 
 private:
 	std::vector<Worker*> m_workers;
-	unsigned m_batch_size;
 };

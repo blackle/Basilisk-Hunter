@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 
-	WorkerPool workers(&challenge, best, 100000, threads);
+	WorkerPool workers(&challenge, best, threads);
 
 	unsigned batches = workers.batches_computed(); //todo: incorporate hash rate counting into its own class
 	ElapsedTimer timer;

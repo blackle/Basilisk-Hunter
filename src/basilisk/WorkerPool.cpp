@@ -3,11 +3,10 @@
 #include "Challenge.h"
 #include <thread>
 
-WorkerPool::WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned batch_size, unsigned count)
-	: m_batch_size(batch_size)
+WorkerPool::WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned count)
 {
 	for (unsigned i = 0; i < count; i++) {
-		auto worker = new Worker(impl_name, batch_size, challenge);
+		auto worker = new Worker(impl_name, challenge);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
 			while (true) {
@@ -37,5 +36,5 @@ unsigned WorkerPool::batches_computed() const
 
 unsigned WorkerPool::batch_size() const
 {
-	return m_batch_size;
+	return Worker::batch_size();
 }

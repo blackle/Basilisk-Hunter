@@ -2,9 +2,10 @@
 #include "Challenge.h"
 #include "Basilisk.h"
 
-Worker::Worker(const std::string& impl_name, unsigned batch_size, Challenge* challenge)
-	: m_batch_size(batch_size)
-	, m_batches(0)
+static constexpr unsigned BATCH_SIZE = 100000;
+
+Worker::Worker(const std::string& impl_name, Challenge* challenge)
+	: m_batches(0)
 	, m_hash(challenge->best_hash())
 	, m_challenge(challenge)
 {
@@ -16,6 +17,10 @@ unsigned Worker::batches() const {
 	return m_batches.load();
 }
 
+unsigned Worker::batch_size() {
+	return BATCH_SIZE;
+}
+
 void Worker::setThread(std::thread* thread) {
 	m_thread.reset(thread);
 }
@@ -25,7 +30,7 @@ std::shared_ptr<std::thread> Worker::thread() {
 }
 
 void Worker::do_batch() {
-	for (unsigned i = 0; i < m_batch_size; i++) {
+	for (unsigned i = 0; i < BATCH_SIZE; i++) {
 		m_basilisk->step();
 
 		if (m_basilisk->final_state() < m_hash) {
