@@ -5,6 +5,7 @@
 #include <algorithm>
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 static const std::array<uint32_t, SHA256_STATE_SIZE> sha256_h0 = {0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a, 0x510e527f, 0x9b05688c, 0x1f83d9ab, 0x5be0cd19};
 
@@ -19,14 +20,6 @@ SHA256State::SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init)
 void SHA256State::reset()
 {
 	std::copy(sha256_h0.begin(), sha256_h0.end(), begin());
-}
-
-void SHA256State::digest(SHA256Digest* digest) const
-{
-	auto digest_alias = reinterpret_cast<uint32_t*>(digest->data());
-	for (size_type i = 0; i < size(); i++) {
-		digest_alias[i] = htonl(at(i));
-	}
 }
 
 void SHA256State::digest(SHA256Block* digest) const
@@ -106,22 +99,12 @@ SHA256Block::size_type SHA256Block::content_length() const
 	return m_content_end;
 }
 
-std::ostream& operator<<(std::ostream& os, const SHA256Digest& digest)
-{
-	std::ios_base::fmtflags f(os.flags());
-	for (auto i = digest.begin(); i != digest.end(); i++) {
-                os << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
-        }
-	os.flags(f);
-	return os;
-}
-
 std::ostream& operator<<(std::ostream& os, const SHA256Block& block)
 {
 	std::ios_base::fmtflags f(os.flags());
 	for (auto i = block.begin(); i != block.end(); i++) {
-                os << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
-        }
+		os << std::setfill('0') << std::setw(2) << std::hex << (int)*i;
+	}
 	os.flags(f);
 	return os;
 }
@@ -130,8 +113,32 @@ std::ostream& operator<<(std::ostream& os, const SHA256State& state)
 {
 	std::ios_base::fmtflags f(os.flags());
 	for (auto i = state.begin(); i != state.end(); i++) {
-                os << std::setfill('0') << std::setw(8) << std::hex << (int)*i;
-        }
+		os << std::setfill('0') << std::setw(8) << std::hex << (int)*i;
+	}
 	os.flags(f);
 	return os;
+}
+
+std::istream& operator>>(std::istream& is, SHA256Block& block)
+{
+	constexpr std::size_t DIGITS = sizeof(uint8_t) * 2;
+	for (auto i = block.begin(); i != block.end(); i++) {
+		std::string bytes(DIGITS, ' ');
+		is.read(&bytes[0], DIGITS);
+		std::istringstream bytes_stream(bytes);
+		bytes_stream >> std::hex >> *i;
+	}
+	return is;
+}
+
+std::istream& operator>>(std::istream& is, SHA256State& state)
+{
+	constexpr std::size_t DIGITS = sizeof(uint32_t) * 2;
+	for (auto i = state.begin(); i != state.end(); i++) {
+		std::string bytes(DIGITS, ' ');
+		is.read(&bytes[0], DIGITS);
+		std::istringstream bytes_stream(bytes);
+		bytes_stream >> std::hex >> *i;
+	}
+	return is;
 }

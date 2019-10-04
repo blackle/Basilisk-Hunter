@@ -58,11 +58,6 @@ std::string Basilisk::prefix()
 	return c.substr(0, c.length() - m_nonce_length);
 }
 
-void Basilisk::digest(SHA256Digest* digest) const
-{
-	m_ctx_final.digest(digest);
-}
-
 const SHA256State& Basilisk::final_state() const
 {
 	return m_ctx_final;

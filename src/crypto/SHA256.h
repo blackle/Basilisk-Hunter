@@ -8,8 +8,6 @@ constexpr int SHA256_STATE_SIZE = 8;
 constexpr int SHA256_DIGEST_SIZE = 32;
 constexpr int SHA256_BLOCK_SIZE = 64;
 
-typedef std::array<uint8_t, SHA256_DIGEST_SIZE> SHA256Digest;
-
 class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
 {
 public:
@@ -36,13 +34,14 @@ public:
 	SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init);
 	void reset();
 
-	void digest(SHA256Digest* digest) const;
 	void digest(SHA256Block* digest) const;
 
 private:
 	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
 };
 
-std::ostream& operator<<(std::ostream& os, const SHA256Digest& digest);
 std::ostream& operator<<(std::ostream& os, const SHA256Block& block);
 std::ostream& operator<<(std::ostream& os, const SHA256State& state);
+
+std::istream& operator>>(std::istream& is, SHA256Block& block);
+std::istream& operator>>(std::istream& is, SHA256State& state);

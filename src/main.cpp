@@ -7,9 +7,6 @@
 #include <iostream>
 #include <thread>
 #include <vector>
-#include <mutex>
-#include <memory>
-#include <atomic>
 
 namespace chrono = std::chrono;
 

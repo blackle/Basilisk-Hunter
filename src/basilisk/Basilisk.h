@@ -14,7 +14,6 @@ public:
 	std::string nonce();
 	std::string prefix();
 
-	void digest(SHA256Digest* digest) const;
 	const SHA256State& final_state() const;
 
 private:
