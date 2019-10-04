@@ -1,5 +1,5 @@
 #include "ArgumentParser.h"
-#include <basilisk/Configuration.h>
+#include <model/Configuration.h>
 #include <iostream>
 
 ArgumentParser::ArgumentParser() : m_parser({{

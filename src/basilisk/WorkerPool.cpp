@@ -1,7 +1,7 @@
 #include "WorkerPool.h"
 #include "Worker.h"
-#include "Challenge.h"
-#include "Configuration.h"
+#include <model/Challenge.h>
+#include <model/Configuration.h>
 #include <thread>
 
 WorkerPool::WorkerPool(Challenge* challenge, const Configuration* config)

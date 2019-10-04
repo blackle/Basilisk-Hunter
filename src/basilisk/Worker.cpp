@@ -1,6 +1,6 @@
 #include "Worker.h"
-#include "Challenge.h"
-#include "Configuration.h"
+#include <model/Challenge.h>
+#include <model/Configuration.h>
 #include "Basilisk.h"
 
 static constexpr unsigned BATCH_SIZE = 100000;

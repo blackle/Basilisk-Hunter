@@ -1,8 +1,8 @@
 #include <crypto/SHA256ImplFactory.h>
 #include <crypto/SHA256State.h>
-#include <basilisk/Challenge.h>
+#include <model/Challenge.h>
+#include <model/Configuration.h>
 #include <basilisk/WorkerPool.h>
-#include <basilisk/Configuration.h>
 #include <basilisk/HashSpeedometer.h>
 #include <chrono>
 #include <iostream>
