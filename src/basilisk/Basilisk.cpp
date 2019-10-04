@@ -1,5 +1,6 @@
 #include "Basilisk.h"
 #include <crypto/NonceUtil.h>
+#include <arpa/inet.h>
 
 constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
 
@@ -35,7 +36,11 @@ void Basilisk::step()
 
 	m_sha->calc_block(&m_ctx_working, m_block_nonce.get());
 
-	m_ctx_working.digest(m_block_final.get());
+	auto digest_alias = reinterpret_cast<uint32_t*>(m_block_final->data());
+	for (unsigned i = 0; i < m_ctx_working.size(); i++) {
+		digest_alias[i] = htonl(m_ctx_working[i]);
+	}
+
 	m_ctx_final.reset();
 	m_sha->calc_block(&m_ctx_final, m_block_final.get());
 }

@@ -34,14 +34,6 @@ public:
 	SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init);
 	void reset();
 
-	void digest(SHA256Block* digest) const;
-
 private:
 	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
 };
-
-std::ostream& operator<<(std::ostream& os, const SHA256Block& block);
-std::ostream& operator<<(std::ostream& os, const SHA256State& state);
-
-std::istream& operator>>(std::istream& is, SHA256Block& block);
-std::istream& operator>>(std::istream& is, SHA256State& state);

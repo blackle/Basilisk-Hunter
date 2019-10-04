@@ -7,6 +7,7 @@
 #include <iostream>
 #include <thread>
 #include <vector>
+#include <array_ios.h>
 
 namespace chrono = std::chrono;
 
