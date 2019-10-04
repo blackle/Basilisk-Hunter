@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 		  "sets your name for the leaderboard (utf-8)", 1},
 		{ "threads", {"--threads"},
 		  "sets the number of threads to run (default 1)", 1},
-		{ "set-impl", {"--set-impl"},
+		{ "impl", {"--impl"},
 		  "sets the sha256 compression function implementation", 1},
 		{ "get-impl", {"--get-impls"},
 		  "lists the supported sha256 compression function implementations", 0},
@@ -35,7 +35,7 @@ int main(int argc, char** argv)
 		args = argparser.parse(argc, argv);
 	} catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
-		return -1;
+		return EXIT_FAILURE;
 	}
 
 	if (args["help"]) {
@@ -44,18 +44,17 @@ int main(int argc, char** argv)
 		std::cerr << std::endl;
 		std::cerr << "Options:" << std::endl;
 		std::cerr << argparser;
-		return 0;
+		return EXIT_SUCCESS;
 	}
 
 	auto best = SHA256ImplFactory::get_best_impl_name();
 	if (best.empty()) {
-		return -1;
+		std::cerr << "No available implementations (this is a bug, please report me)" << std::endl;
+		return EXIT_FAILURE;
 	}
+	std::cout << "Using implementation \"" << best << "\"" << std::endl;
 
-	int threads = std::thread::hardware_concurrency();
-	if (threads <= 0) {
-		threads = 1;
-	}
+	unsigned threads = args["threads"].as<unsigned>(1);
 	std::cout << "spinning up " << threads << " threads!" << std::endl;
 
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
@@ -84,5 +83,5 @@ int main(int argc, char** argv)
 		batches = new_batches;
 	}
 
-	return 0;
+	return EXIT_SUCCESS;
 }
