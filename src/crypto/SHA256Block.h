@@ -1,14 +1,9 @@
 #pragma once
 
-#include <stdint.h>
 #include <string>
 #include <array>
 
-constexpr int SHA256_STATE_SIZE = 8;
-constexpr int SHA256_DIGEST_SIZE = 32;
-constexpr int SHA256_BLOCK_SIZE = 64;
-
-//TODO: move these classes into separate files now that they don't depend on each other
+constexpr unsigned SHA256_BLOCK_SIZE = 64;
 
 class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
 {
@@ -27,15 +22,4 @@ private:
 
 	void init_padding(size_type total_length);
 	size_type m_content_end;
-};
-
-class SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
-{
-public:
-	SHA256State();
-	SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init);
-	void reset();
-
-private:
-	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
 };

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <crypto/SHA256.h>
+#include <crypto/SHA256State.h>
 #include <mutex>
 
 class Challenge {

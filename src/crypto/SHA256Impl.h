@@ -1,6 +1,7 @@
 #pragma once
 
-#include "SHA256.h"
+#include "SHA256Block.h"
+#include "SHA256State.h"
 
 class SHA256Impl {
 public:

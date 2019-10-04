@@ -4,7 +4,7 @@
 #include <mutex>
 #include <atomic>
 #include <thread>
-#include <crypto/SHA256.h>
+#include <crypto/SHA256State.h>
 #include <crypto/SHA256ImplFactory.h>
 
 class Challenge;

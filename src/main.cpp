@@ -1,5 +1,5 @@
 #include <crypto/SHA256ImplFactory.h>
-#include <crypto/SHA256.h>
+#include <crypto/SHA256State.h>
 #include <basilisk/Basilisk.h>
 #include <basilisk/Challenge.h>
 #include <basilisk/WorkerPool.h>

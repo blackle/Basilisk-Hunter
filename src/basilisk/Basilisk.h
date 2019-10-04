@@ -1,6 +1,7 @@
 #pragma once
 
-#include <crypto/SHA256.h>
+#include <crypto/SHA256State.h>
+#include <crypto/SHA256Block.h>
 #include <crypto/SHA256Impl.h>
 #include <string>
 #include <memory>
