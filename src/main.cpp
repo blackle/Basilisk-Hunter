@@ -1,8 +1,8 @@
 #include <crypto/SHA256ImplFactory.h>
 #include <crypto/SHA256.h>
 #include <basilisk/Basilisk.h>
-#include <basilisk/Minimizer.h>
-#include <basilisk/Worker.h>
+#include <basilisk/Challenge.h>
+#include <basilisk/WorkerPool.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -27,48 +27,33 @@ int main(int argc, char** argv)
 	}
 	std::cout << "spinning up " << threads << " threads!" << std::endl;
 
-	Minimizer winner; //todo: initialize with data from server
+	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize with data from server
 
-	//todo: make worker pool to encapsulate this behaviour
-	std::vector<Worker*> workers;
-	for (int i = 0; i < threads; i++) {
-		//wrap parameters to Worker in a ChallengeCampaign or something so it can be passed around
-		auto worker = new Worker(best, "basilisk:0000000000:", 64, &winner);
-		workers.push_back(worker);
-		worker->mutex().lock();
-		worker->setThread(new std::thread([worker] {
-			while (true) {
-				worker->do_batch();
-			}
-		}));
-	}
+	WorkerPool workers(&challenge, best, 100000, threads);
 
-	auto start = chrono::system_clock::now();
-	//worker pool start?
-	for (auto i = workers.begin(); i != workers.end(); i++) {
-		auto worker = *i;
-		worker->mutex().unlock();
-	}
+	workers.resume();
 
+	unsigned batches = workers.batches_computed();
 	while (true) {
-		std::this_thread::sleep_for(chrono::seconds(10));
-		float mhs = 0;
-		for (unsigned i = 0; i < workers.size(); i++) {
-			auto worker = workers[i];
+		auto start = chrono::system_clock::now();
 
-			auto end = chrono::system_clock::now();
-			float ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
-			mhs += (worker->batches()/ms)/1000.0 * worker->batch_size(); //todo: change this from cumulative average to moving average
-		}
+		std::this_thread::sleep_for(chrono::seconds(5));
+
+		unsigned new_batches = workers.batches_computed();
+		auto end = chrono::system_clock::now();
+
+		float ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+		float mhs = (new_batches-batches)/(ms*1000.0) * workers.batch_size();
 		std::cout << "MH/s: " << mhs << std::endl;
 
-		std::lock_guard<std::mutex> lock(winner.mutex());
-		if (winner.is_dirty()) {
-			winner.clear_dirty();
+		std::lock_guard<std::mutex> lock(challenge.mutex());
+		if (challenge.is_dirty()) {
+			challenge.clear_dirty();
 			//todo: send to server
 			std::cout << "New lowest nonce found:" << std::endl;
-			std::cout << winner.nonce() << " " << winner.hash() << std::endl;
+			std::cout << challenge.best_nonce() << " " << challenge.best_hash() << std::endl;
 		}
+		batches = new_batches;
 	}
 
 	return 0;

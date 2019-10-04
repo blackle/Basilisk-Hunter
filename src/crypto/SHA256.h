@@ -8,6 +8,8 @@ constexpr int SHA256_STATE_SIZE = 8;
 constexpr int SHA256_DIGEST_SIZE = 32;
 constexpr int SHA256_BLOCK_SIZE = 64;
 
+//TODO: move these classes into separate files now that they don't depend on each other
+
 class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
 {
 public:
