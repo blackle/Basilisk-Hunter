@@ -9,6 +9,7 @@ include_directories(${CPR_INCLUDE_DIRS})
 
 message(${CMAKE_SYSTEM_PROCESSOR})
 
+include_directories(argagg)
 include_directories(src)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h" "src/*.c")
 

@@ -9,13 +9,43 @@
 #include <thread>
 #include <vector>
 #include <array_ios.h>
+#include <argagg.h>
 
 namespace chrono = std::chrono;
 
 int main(int argc, char** argv)
 {
-	(void)argc; //todo: add cli args
-	(void)argv;
+	argagg::parser argparser {{
+		{ "help", {"-h", "--help"},
+		  "shows this help message", 0},
+		{ "version", {"-v", "--version"},
+		  "shows the program version string", 0},
+		{ "name", {"--name"},
+		  "sets your name for the leaderboard (utf-8)", 1},
+		{ "threads", {"--threads"},
+		  "sets the number of threads to run (default 1)", 1},
+		{ "set-impl", {"--set-impl"},
+		  "sets the sha256 compression function implementation", 1},
+		{ "get-impl", {"--get-impls"},
+		  "lists the supported sha256 compression function implementations", 0},
+	}};
+
+	argagg::parser_results args;
+	try {
+		args = argparser.parse(argc, argv);
+	} catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return -1;
+	}
+
+	if (args["help"]) {
+		std::cerr << "usage: " << argv[0] << " [OPTIONS]..." << std::endl;
+		std::cerr << "A networked program to search for strings that hash to small values." << std::endl;
+		std::cerr << std::endl;
+		std::cerr << "Options:" << std::endl;
+		std::cerr << argparser;
+		return 0;
+	}
 
 	auto best = SHA256ImplFactory::get_best_impl_name();
 	if (best.empty()) {
