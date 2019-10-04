@@ -3,6 +3,7 @@ project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
 
 set(BUILD_CPR_TESTS OFF)
+set(CURL_STATICLIB ON)
 add_subdirectory(cpr)
 include_directories(${CPR_INCLUDE_DIRS})
 

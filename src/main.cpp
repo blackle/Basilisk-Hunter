@@ -45,10 +45,10 @@ int main(int argc, char** argv)
 		float mhs = (new_batches-batches)/(ms*1000.0) * workers.batch_size();
 		std::cout << "MH/s: " << mhs << std::endl;
 
+		std::lock_guard<std::mutex> lock(challenge.mutex());
 		if (challenge.is_dirty()) {
 			challenge.clear_dirty();
 			//todo: send to server
-			std::lock_guard<std::mutex> lock(challenge.mutex());
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << challenge.best_nonce() << " " << challenge.best_hash() << std::endl;
 		}
