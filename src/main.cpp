@@ -3,6 +3,7 @@
 #include <basilisk/Basilisk.h>
 #include <basilisk/Challenge.h>
 #include <basilisk/WorkerPool.h>
+#include <util/ElapsedTimer.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -33,15 +34,14 @@ int main(int argc, char** argv)
 	workers.resume(); //todo: decide why we should even bother with this
 
 	unsigned batches = workers.batches_computed(); //todo: incorporate hash rate counting into its own class
+	ElapsedTimer timer;
 	while (true) {
-		auto start = chrono::system_clock::now(); //todo: make a utility "elapsed timer" class
+		timer.reset();
 
 		std::this_thread::sleep_for(chrono::seconds(10));
 
 		unsigned new_batches = workers.batches_computed();
-		auto end = chrono::system_clock::now();
-
-		float ms = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+		float ms = timer.elapsed<chrono::milliseconds>();
 		float mhs = (new_batches-batches)/(ms*1000.0) * workers.batch_size();
 		std::cout << "MH/s: " << mhs << std::endl;
 
