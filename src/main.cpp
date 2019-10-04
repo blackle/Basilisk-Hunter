@@ -1,8 +1,8 @@
 #include <crypto/SHA256ImplFactory.h>
 #include <crypto/SHA256.h>
 #include <basilisk/Basilisk.h>
-#include <basilisk/BasiliskWinner.h>
-#include <basilisk/BasiliskWorker.h>
+#include <basilisk/Minimizer.h>
+#include <basilisk/Worker.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -27,13 +27,13 @@ int main(int argc, char** argv)
 	}
 	std::cout << "spinning up " << threads << " threads!" << std::endl;
 
-	BasiliskWinner winner; //todo: initialize with data from server
+	Minimizer winner; //todo: initialize with data from server
 
 	//todo: make worker pool to encapsulate this behaviour
-	std::vector<BasiliskWorker*> workers;
+	std::vector<Worker*> workers;
 	for (int i = 0; i < threads; i++) {
-		//wrap parameters to BasiliskWorker in a ChallengeCampaign or something so it can be passed around
-		auto worker = new BasiliskWorker(best, "basilisk:0000000000:", 64, &winner);
+		//wrap parameters to Worker in a ChallengeCampaign or something so it can be passed around
+		auto worker = new Worker(best, "basilisk:0000000000:", 64, &winner);
 		workers.push_back(worker);
 		worker->mutex().lock();
 		worker->setThread(new std::thread([worker] {
@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 			winner.clear_dirty();
 			//todo: send to server
 			std::cout << "New lowest nonce found:" << std::endl;
-			std::cout << winner.nonce() << " " << winner.minimum() << std::endl;
+			std::cout << winner.nonce() << " " << winner.hash() << std::endl;
 		}
 	}
 

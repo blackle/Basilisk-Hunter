@@ -7,12 +7,12 @@
 #include <crypto/SHA256.h>
 #include <crypto/SHA256ImplFactory.h>
 
-class BasiliskWinner;
+class Minimizer;
 class Basilisk;
 
-class BasiliskWorker {
+class Worker {
 public:
-	BasiliskWorker(const std::string& impl_name, const std::string& prefix, int nonce_length, BasiliskWinner* winner);
+	Worker(const std::string& impl_name, const std::string& prefix, int nonce_length, Minimizer* winner);
 
 	unsigned batches() const;
 	static unsigned batch_size();
@@ -29,10 +29,10 @@ private:
 	std::shared_ptr<const SHA256Impl> m_sha;
 	std::shared_ptr<Basilisk> m_basilisk;
 
-	SHA256State m_minimum;
+	SHA256State m_hash;
 
 	std::mutex m_mutex;
 	std::shared_ptr<std::thread> m_thread;
 
-	BasiliskWinner* m_winner;
+	Minimizer* m_winner;
 };
