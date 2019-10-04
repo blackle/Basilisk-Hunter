@@ -3,7 +3,7 @@
 #include <basilisk/Basilisk.h>
 #include <basilisk/Challenge.h>
 #include <basilisk/WorkerPool.h>
-#include <util/ElapsedTimer.h>
+#include <basilisk/HashSpeedometer.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -60,18 +60,14 @@ int main(int argc, char** argv)
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 
 	WorkerPool workers(&challenge, best, threads);
+	HashSpeedometer speedometer(&workers);
 
-	unsigned batches = workers.batches_computed(); //todo: incorporate hash rate counting into its own class
-	ElapsedTimer timer;
 	while (true) {
-		timer.reset();
+		speedometer.start();
 
 		std::this_thread::sleep_for(chrono::seconds(10));
 
-		unsigned new_batches = workers.batches_computed();
-		float ms = timer.elapsed<chrono::milliseconds>();
-		float mhs = (new_batches-batches)/(ms*1000.0) * workers.batch_size();
-		std::cout << "MH/s: " << mhs << std::endl;
+		std::cout << "MH/s: " << speedometer.million_hashes_per_second() << std::endl;
 
 		std::lock_guard<std::mutex> lock(challenge.mutex());
 		if (challenge.is_dirty()) {
@@ -80,7 +76,6 @@ int main(int argc, char** argv)
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << challenge.best_nonce() << " " << challenge.best_hash() << std::endl;
 		}
-		batches = new_batches;
 	}
 
 	return EXIT_SUCCESS;

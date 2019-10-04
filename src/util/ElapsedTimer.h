@@ -7,7 +7,7 @@ namespace chrono = std::chrono;
 class ElapsedTimer {
 public:
 	ElapsedTimer();
-	void reset();
+	void start();
 
 	template <typename T>
 	unsigned elapsed() {

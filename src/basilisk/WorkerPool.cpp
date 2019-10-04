@@ -6,6 +6,7 @@
 WorkerPool::WorkerPool(Challenge* challenge, const std::string& impl_name, unsigned count)
 {
 	for (unsigned i = 0; i < count; i++) {
+		//todo: make RateLimitedWorker
 		auto worker = new Worker(impl_name, challenge);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
@@ -24,7 +25,7 @@ WorkerPool::~WorkerPool()
 	}
 }
 
-unsigned WorkerPool::batches_computed() const
+unsigned WorkerPool::batches() const
 {
 	unsigned sum = 0;
 	for (auto i = m_workers.begin(); i != m_workers.end(); i++) {

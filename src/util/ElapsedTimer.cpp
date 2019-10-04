@@ -1,9 +1,9 @@
 #include "ElapsedTimer.h"
 
 ElapsedTimer::ElapsedTimer() {
-	reset();
+	start();
 }
 
-void ElapsedTimer::reset() {
+void ElapsedTimer::start() {
 	m_start = std::chrono::system_clock::now();
 }
