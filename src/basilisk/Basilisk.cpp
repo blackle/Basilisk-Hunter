@@ -4,6 +4,13 @@
 
 constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
 
+static void copy_state_into_block(SHA256State* state, SHA256Block* block) {
+	auto block_alias = reinterpret_cast<uint32_t*>(block->data());
+	for (unsigned i = 0; i < state->size(); i++) {
+		block_alias[i] = htonl((*state)[i]);
+	}
+}
+
 Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned nonce_length)
 	: m_sha(sha)
 	, m_nonce_length(nonce_length)
@@ -32,14 +39,11 @@ Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned no
 void Basilisk::step()
 {
 	NonceUtil::increment(m_block_nonce->begin(), m_block_nonce->end());
-	m_ctx_working = m_ctx_initial;
 
+	m_ctx_working = m_ctx_initial;
 	m_sha->calc_block(&m_ctx_working, m_block_nonce.get());
 
-	auto digest_alias = reinterpret_cast<uint32_t*>(m_block_final->data());
-	for (unsigned i = 0; i < m_ctx_working.size(); i++) {
-		digest_alias[i] = htonl(m_ctx_working[i]);
-	}
+	copy_state_into_block(&m_ctx_working, m_block_final.get());
 
 	m_ctx_final.reset();
 	m_sha->calc_block(&m_ctx_final, m_block_final.get());
