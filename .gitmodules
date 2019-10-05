@@ -4,3 +4,6 @@
 [submodule "cpr"]
 	path = cpr
 	url = git@github.com:whoshuu/cpr.git
+[submodule "json"]
+	path = json
+	url = git@github.com:nlohmann/json.git

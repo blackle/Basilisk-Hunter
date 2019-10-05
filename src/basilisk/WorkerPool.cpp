@@ -12,6 +12,7 @@ WorkerPool::WorkerPool(Challenge* challenge, const Configuration* config)
 		Worker* worker = WorkerBuilder::build(challenge, config);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
+			//todo: we need to be able to terminate this thread, the WorkerPool destructor will just cause a SIGABRT
 			while (true) {
 				worker->do_batch();
 			}
