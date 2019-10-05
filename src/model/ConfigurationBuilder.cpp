@@ -14,7 +14,7 @@ const Configuration* ConfigurationBuilder::build(int argc, char** argv) {
 
 	if (config->impl().empty()) {
 		std::cout << "No implementation chosen, running tests to automatically pick the best one..." << std::endl;
-		config->setImpl(SHA256ImplFactory::get_best_impl_name());
+		config->set_impl(SHA256ImplFactory::get_best_impl_name());
 		if (config->impl().empty()) {
 			throw std::runtime_error("No available implementations! (this is a bug, please report me)");
 		}

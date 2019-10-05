@@ -6,17 +6,25 @@ class Configuration {
 public:
 	Configuration();
 
-	void setImpl(const std::string& impl);
+	void set_impl(const std::string& impl);
 	const std::string& impl() const;
 
-	void setThreads(unsigned threads);
+	void set_threads(unsigned threads);
 	unsigned threads() const;
 
-	void setName(const std::string& name);
+	void set_name(const std::string& name);
 	const std::string& name() const;
+
+	void set_server(const std::string& server);
+	const std::string& server() const;
+
+	void set_limit(float limit);
+	float limit() const;
 
 private:
 	std::string m_impl;
 	unsigned m_threads;
 	std::string m_name;
+	std::string m_server;
+	float m_limit;
 };
