@@ -11,11 +11,12 @@ class Configuration;
 class WorkerPool : public Batcher {
 public:
 	WorkerPool(Challenge* challenge, const Configuration* config);
-	~WorkerPool();
+	virtual ~WorkerPool();
 
 	virtual unsigned batches() const override;
 	virtual unsigned batch_size() const override;
 
 private:
 	std::vector<Worker*> m_workers;
+	const unsigned m_batch_size;
 };

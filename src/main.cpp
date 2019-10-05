@@ -31,6 +31,9 @@ int main(int argc, char** argv)
 
 	std::cout << "Using implementation \"" << config->impl() << "\"" << std::endl;
 	std::cout << "Spinning up " << config->threads() << " threads!" << std::endl;
+	if (config->limit() > 0) {
+		std::cout << "Rate limiting to " << config->limit() << " MH/s" << std::endl;
+	}
 
 	Challenge challenge("basilisk:0000000000:", 64); //todo: initialize hash with data from server
 

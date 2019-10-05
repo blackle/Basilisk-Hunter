@@ -1,14 +1,15 @@
 #include "WorkerPool.h"
 #include "Worker.h"
+#include "WorkerBuilder.h"
 #include <model/Challenge.h>
 #include <model/Configuration.h>
 #include <thread>
 
 WorkerPool::WorkerPool(Challenge* challenge, const Configuration* config)
+	: m_batch_size(config->batch_size())
 {
 	for (unsigned i = 0; i < config->threads(); i++) {
-		//todo: make RateLimitedWorker
-		auto worker = new Worker(challenge, config);
+		Worker* worker = WorkerBuilder::build(challenge, config);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
 			while (true) {
@@ -38,5 +39,5 @@ unsigned WorkerPool::batches() const
 
 unsigned WorkerPool::batch_size() const
 {
-	return Worker::batch_size();
+	return m_batch_size;
 }

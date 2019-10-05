@@ -12,6 +12,10 @@ const Configuration* ConfigurationBuilder::build(int argc, char** argv) {
 		return nullptr;
 	}
 
+	if (config->threads() == 0) {
+		throw std::runtime_error("Thread count must be non-zero.");
+	}
+
 	if (config->impl().empty()) {
 		std::cout << "No implementation chosen, running tests to automatically pick the best one..." << std::endl;
 		config->set_impl(SHA256ImplFactory::get_best_impl_name());

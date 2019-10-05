@@ -21,10 +21,14 @@ public:
 	void set_limit(float limit);
 	float limit() const;
 
+	void set_batch_size(unsigned batch_size);
+	unsigned batch_size() const;
+
 private:
 	std::string m_impl;
 	unsigned m_threads;
 	std::string m_name;
 	std::string m_server;
 	float m_limit;
+	unsigned m_batch_size;
 };

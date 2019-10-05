@@ -1,8 +1,11 @@
 #include "Configuration.h"
 
+static constexpr unsigned DEFAULT_BATCH_SIZE = 10000;
+
 Configuration::Configuration()
 	: m_threads(0)
 	, m_limit(0)
+	, m_batch_size(DEFAULT_BATCH_SIZE)
 {}
 
 void Configuration::set_impl(const std::string& impl)
@@ -53,4 +56,14 @@ void Configuration::set_limit(float limit)
 float Configuration::limit() const
 {
 	return m_limit;
+}
+
+void Configuration::set_batch_size(unsigned batch_size)
+{
+	m_batch_size = batch_size;
+}
+
+unsigned Configuration::batch_size() const
+{
+	return m_batch_size;
 }

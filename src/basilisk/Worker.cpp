@@ -3,10 +3,9 @@
 #include <model/Configuration.h>
 #include "Basilisk.h"
 
-static constexpr unsigned BATCH_SIZE = 100000;
-
 Worker::Worker(Challenge* challenge, const Configuration* config)
 	: m_batches(0)
+	, m_batch_size(config->batch_size())
 	, m_hash(challenge->best_hash())
 	, m_challenge(challenge)
 {
@@ -14,12 +13,15 @@ Worker::Worker(Challenge* challenge, const Configuration* config)
 	m_basilisk.reset(new Basilisk(m_sha.get(), m_challenge->prefix(), m_challenge->nonce_length()));
 }
 
+Worker::~Worker()
+{}
+
 unsigned Worker::batches() const {
 	return m_batches.load();
 }
 
-unsigned Worker::batch_size() {
-	return BATCH_SIZE;
+unsigned Worker::batch_size() const {
+	return m_batch_size;
 }
 
 void Worker::setThread(std::thread* thread) {
@@ -31,7 +33,7 @@ std::shared_ptr<std::thread> Worker::thread() {
 }
 
 void Worker::do_batch() {
-	for (unsigned i = 0; i < BATCH_SIZE; i++) {
+	for (unsigned i = 0; i < m_batch_size; i++) {
 		m_basilisk->step();
 
 		if (m_basilisk->final_state() < m_hash) {
