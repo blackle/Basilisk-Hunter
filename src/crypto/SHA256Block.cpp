@@ -19,7 +19,7 @@ SHA256Block::SHA256Block(const std::string& data)
 {
 	m_content_end = data.length();
 	if (m_content_end != SHA256_BLOCK_SIZE) {
-		throw "Block data is not exactly 64 bytes!";
+		throw std::runtime_error("Block data is not exactly 64 bytes!");
 	}
 
 	std::copy(data.begin(), data.end(), begin());
@@ -41,7 +41,7 @@ SHA256Block::SHA256Block(size_type offset, size_type total_length)
 void SHA256Block::init_padding(size_type total_length)
 {
 	if (m_content_end > (SHA256_BLOCK_SIZE - 9)) {
-		throw "Cannot pad this block, not enough room!";
+		throw std::runtime_error("Cannot pad this block, not enough room!");
 	}
 
 	std::fill(content_end(), end(), 0);

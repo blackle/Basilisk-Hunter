@@ -5,12 +5,12 @@
 #include <string>
 
 class Worker;
-class Challenge;
+class SharedChallenge;
 class Configuration;
 
 class WorkerPool : public Batcher {
 public:
-	WorkerPool(Challenge* challenge, const Configuration* config);
+	WorkerPool(SharedChallenge* challenge, const Configuration* config);
 	virtual ~WorkerPool();
 
 	virtual unsigned batches() const override;

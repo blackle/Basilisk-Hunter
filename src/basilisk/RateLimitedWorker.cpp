@@ -9,7 +9,7 @@ namespace chrono = std::chrono;
 constexpr int MICROSECONDS_IN_SECOND = chrono::duration_cast<chrono::microseconds>(chrono::seconds(1)).count();
 constexpr float FUDGE_FACTOR = 0.9;
 
-RateLimitedWorker::RateLimitedWorker(Challenge* winner, const Configuration* config, float limit)
+RateLimitedWorker::RateLimitedWorker(SharedChallenge* winner, const Configuration* config, float limit)
 	: super(winner, config)
 	, m_limit(limit)
 	, m_speedometer(this)

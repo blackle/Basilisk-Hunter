@@ -1,9 +1,9 @@
 #include "Worker.h"
-#include <model/Challenge.h>
+#include <model/SharedChallenge.h>
 #include <model/Configuration.h>
 #include "Basilisk.h"
 
-Worker::Worker(Challenge* challenge, const Configuration* config)
+Worker::Worker(SharedChallenge* challenge, const Configuration* config)
 	: m_batches(0)
 	, m_batch_size(config->batch_size())
 	, m_hash(challenge->best_hash())

@@ -1,11 +1,11 @@
 #pragma once
 
-class Challenge;
+class SharedChallenge;
 class Configuration;
 class Worker;
 
 class WorkerBuilder
 {
 public:
-	static Worker* build(Challenge* challenge, const Configuration* config);
+	static Worker* build(SharedChallenge* challenge, const Configuration* config);
 };

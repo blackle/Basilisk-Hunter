@@ -3,7 +3,7 @@
 
 class RateLimitedWorker : public Worker {
 public:
-	RateLimitedWorker(Challenge* winner, const Configuration* config, float limit);
+	RateLimitedWorker(SharedChallenge* winner, const Configuration* config, float limit);
 	virtual ~RateLimitedWorker();
 
 protected:

@@ -5,7 +5,7 @@
 #include <model/Configuration.h>
 #include <thread>
 
-WorkerPool::WorkerPool(Challenge* challenge, const Configuration* config)
+WorkerPool::WorkerPool(SharedChallenge* challenge, const Configuration* config)
 	: m_batch_size(config->batch_size())
 {
 	for (unsigned i = 0; i < config->threads(); i++) {

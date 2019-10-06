@@ -1,5 +1,5 @@
 #include "Basilisk.h"
-#include <crypto/NonceUtil.h>
+#include <util/NonceUtil.h>
 #include <arpa/inet.h>
 
 constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
@@ -25,11 +25,11 @@ Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned no
 	}
 
 	if (residual.length() > nonce_length) {
-		throw "Last block contains non-nonce characters";
+		throw std::runtime_error("Last block contains non-nonce characters");
 	}
 
 	if (residual.length() <= MIN_ENTROPY_BYTES) {
-		throw "Not enough entropy in last block";
+		throw std::runtime_error("Not enough entropy in last block");
 	}
 
 	m_block_nonce.reset(new SHA256Block(residual, m_challenge.length()));

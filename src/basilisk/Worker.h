@@ -7,13 +7,13 @@
 #include <crypto/SHA256ImplFactory.h>
 #include "Batcher.h"
 
-class Challenge;
+class SharedChallenge;
 class Configuration;
 class Basilisk;
 
 class Worker : public Batcher {
 public:
-	Worker(Challenge* winner, const Configuration* config);
+	Worker(SharedChallenge* winner, const Configuration* config);
 	virtual ~Worker();
 
 	virtual unsigned batches() const override;
@@ -33,8 +33,9 @@ private:
 	std::shared_ptr<const SHA256Impl> m_sha;
 	std::shared_ptr<Basilisk> m_basilisk;
 
+	//todo: make m_hash a shared challenge and use it's `nominate` function to keep track of local minimum
 	SHA256State m_hash;
-	Challenge* m_challenge;
+	SharedChallenge* m_challenge;
 
 	std::shared_ptr<std::thread> m_thread;
 };
