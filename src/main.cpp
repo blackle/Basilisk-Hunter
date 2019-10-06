@@ -1,5 +1,3 @@
-#include <crypto/SHA256ImplFactory.h>
-#include <crypto/SHA256State.h>
 #include <model/SharedChallenge.h>
 #include <model/Configuration.h>
 #include <model/ConfigurationBuilder.h>

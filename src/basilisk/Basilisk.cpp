@@ -1,15 +1,7 @@
 #include "Basilisk.h"
 #include <util/NonceUtil.h>
-#include <arpa/inet.h>
 
 constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
-
-static void copy_state_into_block(SHA256State* state, SHA256Block* block) {
-	auto block_alias = reinterpret_cast<uint32_t*>(block->data());
-	for (unsigned i = 0; i < state->size(); i++) {
-		block_alias[i] = htonl((*state)[i]);
-	}
-}
 
 Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned nonce_length)
 	: m_sha(sha)
@@ -17,12 +9,7 @@ Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned no
 {
 	m_challenge = prefix + NonceUtil::build(nonce_length);
 
-	auto residual = m_challenge;
-	while (residual.length() >= SHA256_BLOCK_SIZE) {
-		SHA256Block block(residual.substr(0, SHA256_BLOCK_SIZE));
-		m_sha->calc_block(&m_ctx_initial, &block);
-		residual.erase(0, SHA256_BLOCK_SIZE);
-	}
+	auto residual = m_sha->hash_to_padding(&m_ctx_initial, m_challenge);
 
 	if (residual.length() > nonce_length) {
 		throw std::runtime_error("Last block contains non-nonce characters");
@@ -43,7 +30,7 @@ void Basilisk::step()
 	m_ctx_working = m_ctx_initial;
 	m_sha->calc_block(&m_ctx_working, m_block_nonce.get());
 
-	copy_state_into_block(&m_ctx_working, m_block_final.get());
+	SHA256Impl::copy_state_into_block(&m_ctx_working, m_block_final.get());
 
 	m_ctx_final.reset();
 	m_sha->calc_block(&m_ctx_final, m_block_final.get());
