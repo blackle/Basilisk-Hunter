@@ -8,7 +8,6 @@
 #include <model/Solution.h>
 #include "Batcher.h"
 
-class SharedChallenge;
 class Challenge;
 template <typename T> class LockBox;
 class Configuration;
@@ -16,7 +15,7 @@ class Basilisk;
 
 class Worker : public Batcher {
 public:
-	Worker(SharedChallenge* winner, const Configuration* config);
+	Worker(LockBox<Challenge>* box, const Configuration* config);
 	virtual ~Worker();
 
 	virtual unsigned batches() const override;
@@ -37,7 +36,6 @@ private:
 	std::shared_ptr<Basilisk> m_basilisk;
 
 	Solution m_solution;
-	SharedChallenge* m_challenge;
 	LockBox<Challenge>* m_box;
 
 	std::shared_ptr<std::thread> m_thread;

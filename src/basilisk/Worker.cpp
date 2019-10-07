@@ -1,16 +1,18 @@
 #include "Worker.h"
-#include <model/SharedChallenge.h>
+#include "ChallengeOperations.h"
 #include <model/Configuration.h>
+#include <model/Challenge.h>
+#include <util/LockBox.h>
 #include "Basilisk.h"
 
-Worker::Worker(SharedChallenge* challenge, const Configuration* config)
+Worker::Worker(LockBox<Challenge>* box, const Configuration* config)
 	: m_batches(0)
 	, m_batch_size(config->batch_size())
-	, m_challenge(challenge)
+	, m_box(box)
 {
-	std::lock_guard<std::mutex> lock(m_challenge->mutex());
+	const Unlocker<Challenge> challenge(m_box);
 	m_sha.reset(SHA256ImplFactory::get_impl(config->impl()));
-	m_basilisk.reset(new Basilisk(m_sha.get(), m_challenge->prefix(lock), m_challenge->nonce_length(lock)));
+	m_basilisk.reset(new Basilisk(m_sha.get(), challenge->prefix(), challenge->nonce_length()));
 }
 
 Worker::~Worker()
@@ -39,7 +41,7 @@ void Worker::do_batch() {
 		if (m_basilisk->final_state() < m_solution.hash()) {
 			m_solution = Solution(m_basilisk->final_state(), m_basilisk->nonce());
 
-			m_challenge->reconcile_solutions(m_solution);
+			ChallengeOperations::reconcile_solutions(m_box, m_solution);
 		}
 	}
 	m_batches++;

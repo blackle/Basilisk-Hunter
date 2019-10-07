@@ -1,15 +1,14 @@
 #include "WorkerPool.h"
 #include "Worker.h"
 #include "WorkerBuilder.h"
-#include <model/Challenge.h>
 #include <model/Configuration.h>
 #include <thread>
 
-WorkerPool::WorkerPool(SharedChallenge* challenge, const Configuration* config)
+WorkerPool::WorkerPool(LockBox<Challenge>* box, const Configuration* config)
 	: m_batch_size(config->batch_size())
 {
 	for (unsigned i = 0; i < config->threads(); i++) {
-		Worker* worker = WorkerBuilder::build(challenge, config);
+		Worker* worker = WorkerBuilder::build(box, config);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
 			//todo: we need to be able to terminate this thread, the WorkerPool destructor will just cause a SIGABRT

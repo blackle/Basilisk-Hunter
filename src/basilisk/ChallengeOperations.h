@@ -9,6 +9,6 @@ class ChallengeOperations
 {
 public:
 	ChallengeOperations() = delete;
-	bool get_new_solution(LockBox<Challenge>* box, Solution& s);
-	bool reconcile_solutions(LockBox<Challenge>* box, Solution& s);
+	static bool get_new_solution(LockBox<Challenge>* box, Solution& s);
+	static bool reconcile_solutions(LockBox<Challenge>* box, Solution& s);
 };

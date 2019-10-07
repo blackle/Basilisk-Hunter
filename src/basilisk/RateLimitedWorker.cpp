@@ -8,8 +8,8 @@ namespace chrono = std::chrono;
 
 constexpr int MICROSECONDS_IN_SECOND = chrono::duration_cast<chrono::microseconds>(chrono::seconds(1)).count();
 
-RateLimitedWorker::RateLimitedWorker(SharedChallenge* winner, const Configuration* config, float limit)
-	: super(winner, config)
+RateLimitedWorker::RateLimitedWorker(LockBox<Challenge>* box, const Configuration* config, float limit)
+	: super(box, config)
 	, m_limit(limit)
 	, m_speedometer(this)
 {}

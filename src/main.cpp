@@ -1,8 +1,9 @@
-#include <model/SharedChallenge.h>
+#include <model/Challenge.h>
 #include <model/Configuration.h>
 #include <model/ConfigurationBuilder.h>
 #include <basilisk/WorkerPool.h>
 #include <basilisk/HashSpeedometer.h>
+#include <basilisk/ChallengeOperations.h>
 #include <io/ServerSession.h>
 #include <io/array_ios.h>
 #include <util/LockBox.h>
@@ -51,8 +52,7 @@ int main(int argc, char** argv)
 	std::cout << "best server hash: " << challenge.solution().hash() << std::endl;
 
 	LockBox<Challenge> challenge_box(challenge);
-	SharedChallenge shared_challenge(challenge);
-	WorkerPool workers(&shared_challenge, config.get());
+	WorkerPool workers(&challenge_box, config.get());
 	HashSpeedometer speedometer(&workers);
 	ElapsedTimer timer;
 
@@ -64,18 +64,20 @@ int main(int argc, char** argv)
 
 		std::cout << "MH/s: " << speedometer.million_hashes_per_second() << std::endl;
 
-		auto new_solution = shared_challenge.get_new_solution();
-		if (new_solution != Solution::null()) {
+		Solution new_solution = challenge.solution();
+		if (ChallengeOperations::get_new_solution(&challenge_box, new_solution)) {
+			challenge.set_solution(new_solution);
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << new_solution.nonce() << " " << new_solution.hash() << std::endl;
 
 			try {
 				std::cout << "Sending new solution to server..." << std::endl;
 
-				challenge.set_solution(new_solution);
 				challenge = session.post_challenge(challenge);
-				new_solution = challenge.solution(); //todo: this is mildly annoying...
-				shared_challenge.reconcile_solutions(new_solution);
+				new_solution = challenge.solution();
+				if (ChallengeOperations::reconcile_solutions(&challenge_box, new_solution)) { //todo: fix me
+					std::cout << "Our solution was the winner!" << std::endl;
+				}
 
 				std::cout << "Solution sent!" << std::endl;
 			} catch (const std::exception& e) {
