@@ -4,5 +4,5 @@
 
 using json = nlohmann::json;
 
-void to_json(json& j, const Challenge& p);
-void from_json(json& j, Challenge& p);
+void to_json(json& j, const Challenge& c);
+void from_json(const json& j, Challenge& c);

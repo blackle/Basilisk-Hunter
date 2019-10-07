@@ -27,8 +27,16 @@ int main(int argc, char** argv)
 		return EXIT_SUCCESS;
 	}
 
-	// ServerSession session(config.get());
-	// session.get_challenge_list();
+	ServerSession session(config.get());
+	auto challenges = session.get_challenge_list();
+	for (auto i = challenges.begin(); i != challenges.end(); i++) {
+		std::cout << "====" << std::endl;
+		std::cout << i->id() << std::endl;
+		std::cout << i->prefix() << std::endl;
+		std::cout << i->nonce_length() << std::endl;
+		std::cout << i->best_nonce() << std::endl;
+		std::cout << i->best_hash() << std::endl;
+	}
 
 	std::cout << "Using implementation \"" << config->impl() << "\"" << std::endl;
 	std::cout << "Spinning up " << config->threads() << " threads!" << std::endl;
@@ -36,7 +44,7 @@ int main(int argc, char** argv)
 		std::cout << "Rate limiting to " << config->limit() << " MH/s" << std::endl;
 	}
 
-	SharedChallenge shared_challenge(Challenge("", "basilisk:0000000000:", 64)); //todo: initialize hash with data from server
+	SharedChallenge shared_challenge(challenges.at(0)); //todo: initialize hash with data from server
 
 	WorkerPool workers(&shared_challenge, config.get());
 	HashSpeedometer speedometer(&workers);

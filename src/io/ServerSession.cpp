@@ -1,8 +1,10 @@
 #include "ServerSession.h"
+#include "Challenge_json.h"
 #include <model/Configuration.h>
 #include <util/NonceUtil.h>
-#include <iostream>
+#include <memory>
 #include <nlohmann/json.hpp>
+#include <crypto/SHA256ImplFactory.h>
 
 using json = nlohmann::json;
 
@@ -19,26 +21,24 @@ std::vector<Challenge> ServerSession::get_challenge_list() const
 	init_session(session, "/challenges/");
 	auto response = session.Get();
 
-	//todo: make parser classes
+	//todo: make parser classes...?
 	if (response.status_code != 200) {
 		throw std::runtime_error("Error getting challenge list.");
 	}
 
+	std::unique_ptr<const SHA256Impl> impl(SHA256ImplFactory::get_impl(m_config->impl()));
+
 	auto list = json::parse(response.text);
-
-	if (!list.is_array()) {
-		throw std::runtime_error("Challenge list response is not a list.");
-	}
-
 	for (json::iterator i = list.begin(); i != list.end(); ++i) {
-		auto o = *i;
-		if (!o.is_object()) {
-			throw std::runtime_error("Challenge object is not an object.");
+		auto challenge = i->get<Challenge>();
+		//todo: put in parser
+		auto hash = impl->double_hash(challenge.prefix() + challenge.best_nonce());
+		if (hash != challenge.best_hash()) {
+			throw std::runtime_error("Server has an invalid solution!");
 		}
-
-		Challenge challenge(o["id"], o["prefix"], o["nonce_length"]);
-		std::string hash = o["prefix"].get<std::string>() + o["best_nonce"].get<std::string>();
-		// challenge.nominate(hash, o["best_nonce"])
+		if (challenge.best_nonce().length() != challenge.nonce_length()) {
+			throw std::runtime_error("Server has an invalid solution!");
+		}
 		challenge_list.push_back(challenge);
 	}
 

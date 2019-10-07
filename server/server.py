@@ -4,10 +4,11 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 
 CHALLENGES = [{
-	"id": 0,
+	"id": "0000000000",
 	"prefix": "basilisk:0000000000:",
 	"nonce_length": 64,
-	"best_nonce": "7cv3PgAwLGnL2albjmfnHGGfy4uNKh0Vv3i49BV58lcBemC2YZOvbaPG0YyX8GVN",
+	"best_nonce": "AkD43Rwbud4zUdrfSKWdUnL9zW36CMyBGL8XQwiQnway6wBc1hPqG00cpUtSsq0k",
+	"best_hash": "0001e7ef89881a7e3a00a121cf0741905ee9d63091ed5a603521f3ab3b809289",
 }]
 
 class ChallengesRequestHandler(BaseHTTPRequestHandler):
