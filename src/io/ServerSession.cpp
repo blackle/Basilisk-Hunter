@@ -19,7 +19,7 @@ std::vector<Challenge> ServerSession::get_challenge_list() const
 	auto response = session.Get();
 
 	if (response.status_code != 200) {
-		throw std::runtime_error("Error getting challenge list.");
+		throw std::runtime_error("Error getting challenge list from server.");
 	}
 
 	//todo: validate challenges here

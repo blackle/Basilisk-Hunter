@@ -27,27 +27,31 @@ int main(int argc, char** argv)
 		return EXIT_SUCCESS;
 	}
 
-	ServerSession session(config.get());
-	auto challenges = session.get_challenge_list();
-	for (auto i = challenges.begin(); i != challenges.end(); i++) {
-		std::cout << "====" << std::endl;
-		std::cout << i->id() << std::endl;
-		std::cout << i->prefix() << std::endl;
-		std::cout << i->nonce_length() << std::endl;
-		std::cout << i->best_nonce() << std::endl;
-		std::cout << i->best_hash() << std::endl;
-	}
-
 	std::cout << "Using implementation \"" << config->impl() << "\"" << std::endl;
 	std::cout << "Spinning up " << config->threads() << " threads!" << std::endl;
 	if (config->limit() > 0) {
 		std::cout << "Rate limiting to " << config->limit() << " MH/s" << std::endl;
 	}
 
-	SharedChallenge shared_challenge(challenges.at(0)); //todo: initialize hash with data from server
+	std::cout << "Contacting server..." << std::endl;
+	ServerSession session(config.get());
+	std::vector<Challenge> challenges;
+	try {
+		challenges = session.get_challenge_list();
+	} catch (const std::exception& e) {
+		std::cerr << e.what() << std::endl;
+		return EXIT_FAILURE;
+	}
+
+	//todo: choose randomly
+	SharedChallenge shared_challenge(challenges.at(0));
+	std::cout << "Running challenge id: " << shared_challenge.id() << std::endl;
+	std::cout << "prefix: " << shared_challenge.prefix() << " nonce_length: " << shared_challenge.nonce_length() << std::endl;
+	std::cout << "best hash: " << shared_challenge.best_hash() << std::endl;
 
 	WorkerPool workers(&shared_challenge, config.get());
 	HashSpeedometer speedometer(&workers);
+	ElapsedTimer timer;
 
 	//todo: graceful exit on ctrl+c
 	while (true) {
@@ -64,6 +68,10 @@ int main(int argc, char** argv)
 			//note to self: save best_nonce/best_hash and unlock before synchronously communicating with server (or just do async...)
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << shared_challenge.best_nonce() << " " << shared_challenge.best_hash() << std::endl;
+		}
+
+		if (timer.elapsed<chrono::minutes>() > 5) {
+			//todo: report number of hashes computed every 5 minutes
 		}
 	}
 
