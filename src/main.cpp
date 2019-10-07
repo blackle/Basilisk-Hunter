@@ -13,7 +13,7 @@
 namespace chrono = std::chrono;
 
 //todo: audit when we print to cout vs cerr, and when we should or shouldn't
-//todo: maybe make a configurable logger?
+//todo: maybe make a configurable logger? we should print out the program name on each line of std::cerr
 int main(int argc, char** argv)
 {
 	std::unique_ptr<const Configuration> config;
