@@ -9,6 +9,8 @@
 #include "Batcher.h"
 
 class SharedChallenge;
+class Challenge;
+template <typename T> class LockBox;
 class Configuration;
 class Basilisk;
 
@@ -34,9 +36,9 @@ private:
 	std::shared_ptr<const SHA256Impl> m_sha;
 	std::shared_ptr<Basilisk> m_basilisk;
 
-	//todo: make m_hash a shared challenge and use it's `nominate` function to keep track of local minimum
 	Solution m_solution;
 	SharedChallenge* m_challenge;
+	LockBox<Challenge>* m_box;
 
 	std::shared_ptr<std::thread> m_thread;
 };

@@ -5,6 +5,7 @@
 #include <basilisk/HashSpeedometer.h>
 #include <io/ServerSession.h>
 #include <io/array_ios.h>
+#include <util/LockBox.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -49,6 +50,7 @@ int main(int argc, char** argv)
 	std::cout << "prefix: \"" << challenge.prefix() << "\" nonce_length: " << challenge.nonce_length() << std::endl;
 	std::cout << "best server hash: " << challenge.solution().hash() << std::endl;
 
+	LockBox<Challenge> challenge_box(challenge);
 	SharedChallenge shared_challenge(challenge);
 	WorkerPool workers(&shared_challenge, config.get());
 	HashSpeedometer speedometer(&workers);
