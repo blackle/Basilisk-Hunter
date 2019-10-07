@@ -6,7 +6,7 @@
 Worker::Worker(SharedChallenge* challenge, const Configuration* config)
 	: m_batches(0)
 	, m_batch_size(config->batch_size())
-	, m_hash(challenge->best_hash())
+	, m_solution(challenge->solution())
 	, m_challenge(challenge)
 {
 	m_sha.reset(SHA256ImplFactory::get_impl(config->impl()));
@@ -36,10 +36,16 @@ void Worker::do_batch() {
 	for (unsigned i = 0; i < m_batch_size; i++) {
 		m_basilisk->step();
 
-		if (m_basilisk->final_state() < m_hash) {
-			m_hash = m_basilisk->final_state();
+		if (m_basilisk->final_state() < m_solution.hash()) {
+			m_solution = Solution(m_basilisk->final_state(), m_basilisk->nonce());
+
 			std::lock_guard<std::mutex> lock(m_challenge->mutex());
-			m_challenge->nominate(m_hash, m_basilisk->nonce());
+			if (m_solution.hash() < m_challenge->solution().hash()) {
+				m_challenge->set_solution(m_solution);
+				m_challenge->set_dirty(true);
+			} else {
+				m_solution = m_challenge->solution();
+			}
 		}
 	}
 	m_batches++;

@@ -5,6 +5,7 @@
 #include <thread>
 #include <crypto/SHA256State.h>
 #include <crypto/SHA256ImplFactory.h>
+#include <model/Solution.h>
 #include "Batcher.h"
 
 class SharedChallenge;
@@ -34,7 +35,7 @@ private:
 	std::shared_ptr<Basilisk> m_basilisk;
 
 	//todo: make m_hash a shared challenge and use it's `nominate` function to keep track of local minimum
-	SHA256State m_hash;
+	Solution m_solution;
 	SharedChallenge* m_challenge;
 
 	std::shared_ptr<std::thread> m_thread;

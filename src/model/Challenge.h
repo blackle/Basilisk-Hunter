@@ -1,6 +1,7 @@
 #pragma once
 
 #include <crypto/SHA256State.h>
+#include "Solution.h"
 
 //todo: make more like Configuration class with setters and default constructor
 class Challenge {
@@ -17,17 +18,11 @@ public:
 	void set_nonce_length(unsigned length);
 	unsigned nonce_length() const;
 
-	//todo: make nonce+hash a "solution" model class?
-	void set_hash_and_nonce(const SHA256State& hash, const std::string& nonce);
-	const SHA256State& best_hash() const;
-	const std::string& best_nonce() const;
-
-	//todo: can this just be defined in the SharedChallenge? make set_hash_and_nonce protected with friends?
-	virtual bool nominate(SHA256State& hash, const std::string& nonce);
+	void set_solution(const Solution& solution);
+	const Solution& solution() const;
 
 private:
-	SHA256State m_hash;
-	std::string m_nonce;
+	Solution m_solution;
 
 	std::string m_id;
 	std::string m_prefix;

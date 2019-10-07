@@ -13,10 +13,8 @@ public:
 
 	std::mutex& mutex();
 
-	virtual bool nominate(SHA256State& hash, const std::string& nonce) override;
-
 	bool is_dirty() const;
-	void clear_dirty();
+	void set_dirty(bool dirty);
 
 private:
 	typedef Challenge super;

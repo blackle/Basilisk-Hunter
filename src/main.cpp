@@ -47,7 +47,7 @@ int main(int argc, char** argv)
 	SharedChallenge shared_challenge(challenges.at(0));
 	std::cout << "Running challenge id: " << shared_challenge.id() << std::endl;
 	std::cout << "prefix: " << shared_challenge.prefix() << " nonce_length: " << shared_challenge.nonce_length() << std::endl;
-	std::cout << "best hash: " << shared_challenge.best_hash() << std::endl;
+	std::cout << "best hash: " << shared_challenge.solution().hash() << std::endl;
 
 	WorkerPool workers(&shared_challenge, config.get());
 	HashSpeedometer speedometer(&workers);
@@ -63,11 +63,12 @@ int main(int argc, char** argv)
 
 		std::lock_guard<std::mutex> lock(shared_challenge.mutex());
 		if (shared_challenge.is_dirty()) {
-			shared_challenge.clear_dirty();
+			shared_challenge.set_dirty(false);
 			//todo: send to server
 			//note to self: save best_nonce/best_hash and unlock before synchronously communicating with server (or just do async...)
 			std::cout << "New lowest nonce found:" << std::endl;
-			std::cout << shared_challenge.best_nonce() << " " << shared_challenge.best_hash() << std::endl;
+			auto solution = shared_challenge.solution();
+			std::cout << solution.nonce() << " " << solution.hash() << std::endl;
 		}
 
 		if (timer.elapsed<chrono::minutes>() > 5) {
