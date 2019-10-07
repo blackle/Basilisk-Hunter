@@ -45,14 +45,11 @@ int main(int argc, char** argv)
 
 	//todo: choose randomly
 	Challenge challenge = challenges.at(0);
-	SharedChallenge shared_challenge(challenge);
-	{
-		std::lock_guard<std::mutex> lock(shared_challenge.mutex());
-		std::cout << "Running challenge id: " << shared_challenge.id(lock) << std::endl;
-		std::cout << "prefix: \"" << shared_challenge.prefix(lock) << "\" nonce_length: " << shared_challenge.nonce_length(lock) << std::endl;
-		std::cout << "best server hash: " << shared_challenge.solution(lock).hash() << std::endl;
-	}
+	std::cout << "Running challenge id: " << challenge.id() << std::endl;
+	std::cout << "prefix: \"" << challenge.prefix() << "\" nonce_length: " << challenge.nonce_length() << std::endl;
+	std::cout << "best server hash: " << challenge.solution().hash() << std::endl;
 
+	SharedChallenge shared_challenge(challenge);
 	WorkerPool workers(&shared_challenge, config.get());
 	HashSpeedometer speedometer(&workers);
 	ElapsedTimer timer;
