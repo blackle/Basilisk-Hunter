@@ -12,6 +12,16 @@
 
 namespace chrono = std::chrono;
 
+static Solution get_new_solution(SharedChallenge& challenge) {
+	std::lock_guard<std::mutex> lock(challenge.mutex());
+
+	if (challenge.is_dirty()) {
+		challenge.set_dirty(false);
+		return challenge.solution();
+	}
+	return Solution::null();
+}
+
 //todo: audit when we print to cout vs cerr, and when we should or shouldn't
 //todo: maybe make a configurable logger?
 int main(int argc, char** argv)
@@ -60,15 +70,13 @@ int main(int argc, char** argv)
 		std::this_thread::sleep_for(chrono::seconds(10));
 
 		std::cout << "MH/s: " << speedometer.million_hashes_per_second() << std::endl;
+		std::cout << "MH: " << static_cast<uint64_t>(workers.batches())*workers.batch_size() << std::endl;
 
-		std::lock_guard<std::mutex> lock(shared_challenge.mutex());
-		if (shared_challenge.is_dirty()) {
-			shared_challenge.set_dirty(false);
-			//todo: send to server
-			//note to self: save best_nonce/best_hash and unlock before synchronously communicating with server (or just do async...)
+		//todo: send to server
+		auto new_solution = get_new_solution(shared_challenge);
+		if (new_solution != Solution::null()) {
 			std::cout << "New lowest nonce found:" << std::endl;
-			auto solution = shared_challenge.solution();
-			std::cout << solution.nonce() << " " << solution.hash() << std::endl;
+			std::cout << new_solution.nonce() << " " << new_solution.hash() << std::endl;
 		}
 
 		if (timer.elapsed<chrono::minutes>() > 5) {

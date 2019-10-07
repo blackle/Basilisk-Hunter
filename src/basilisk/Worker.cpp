@@ -3,10 +3,19 @@
 #include <model/Configuration.h>
 #include "Basilisk.h"
 
+static void reconcile_solutions(SharedChallenge* challenge, Solution& solution) {
+	std::lock_guard<std::mutex> lock(challenge->mutex());
+	if (solution < challenge->solution()) {
+		challenge->set_solution(solution);
+		challenge->set_dirty(true);
+	} else {
+		solution = challenge->solution();
+	}
+}
+
 Worker::Worker(SharedChallenge* challenge, const Configuration* config)
 	: m_batches(0)
 	, m_batch_size(config->batch_size())
-	, m_solution(challenge->solution())
 	, m_challenge(challenge)
 {
 	m_sha.reset(SHA256ImplFactory::get_impl(config->impl()));
@@ -39,13 +48,7 @@ void Worker::do_batch() {
 		if (m_basilisk->final_state() < m_solution.hash()) {
 			m_solution = Solution(m_basilisk->final_state(), m_basilisk->nonce());
 
-			std::lock_guard<std::mutex> lock(m_challenge->mutex());
-			if (m_solution.hash() < m_challenge->solution().hash()) {
-				m_challenge->set_solution(m_solution);
-				m_challenge->set_dirty(true);
-			} else {
-				m_solution = m_challenge->solution();
-			}
+			reconcile_solutions(m_challenge, m_solution);
 		}
 	}
 	m_batches++;
