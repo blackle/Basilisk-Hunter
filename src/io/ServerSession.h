@@ -17,7 +17,8 @@ public:
 	void post_hash_count(uint64_t hashes) const;
 
 private:
-	void init_session(cpr::Session& session, const std::string& path) const;
+	cpr::Header default_headers() const;
+	cpr::Url make_url(const std::string& path) const;
 
 	const Configuration* m_config;
 	const std::string m_session_key;

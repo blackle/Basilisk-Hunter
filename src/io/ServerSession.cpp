@@ -1,5 +1,6 @@
 #include "ServerSession.h"
 #include "ChallengeValidator.h"
+#include "QEncoder.h"
 #include <crypto/SHA256ImplFactory.h>
 #include <json/Challenge_json.h>
 #include <model/Configuration.h>
@@ -18,7 +19,8 @@ ServerSession::ServerSession(const Configuration* config)
 std::vector<Challenge> ServerSession::get_challenge_list() const
 {
 	cpr::Session session;
-	init_session(session, "/challenges/");
+	session.SetOption(make_url("/challenges/"));
+	session.SetOption(default_headers());
 	auto response = session.Get();
 
 	if (response.status_code != 200) {
@@ -40,9 +42,10 @@ std::vector<Challenge> ServerSession::get_challenge_list() const
 Challenge ServerSession::post_challenge(const Challenge& challenge) const
 {
 	cpr::Session session;
-	init_session(session, "/challenges/" + challenge.id());
-
-	session.SetOption(cpr::Header{{"Content-Type", "application/json"}}); //todo: this overrides the other headers :c
+	auto headers = default_headers();
+	headers.insert({"Content-Type", "application/json"});
+	session.SetOption(make_url("/challenges/" + challenge.id()));
+	session.SetOption(headers);
 	session.SetOption(cpr::Body{json(challenge).dump()});
 
 	auto response = session.Post();
@@ -65,12 +68,16 @@ void ServerSession::post_hash_count(uint64_t hashes) const
 	(void) hashes;
 }
 
-void ServerSession::init_session(cpr::Session& session, const std::string& path) const {
+cpr::Header ServerSession::default_headers() const
+{
 	//todo: set user agent to string based on version
-	session.SetOption(cpr::Header{
+	return cpr::Header{
 		{"Basilisk-Session-Key", m_session_key},
-		{"Basilisk-User-Name", m_config->name()},
+		{"Basilisk-User-Name", QEncoder::encode_utf8(m_config->name())},
 		{"User-Agent", "basilisk-client/0.0.0"}
-	});
-	session.SetOption(cpr::Url{m_config->server() + path});
+	};
+}
+
+cpr::Url ServerSession::make_url(const std::string& path) const {
+	return cpr::Url{m_config->server() + path};
 }
