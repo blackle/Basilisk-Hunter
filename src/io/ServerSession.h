@@ -13,8 +13,8 @@ public:
 	explicit ServerSession(const Configuration* config);
 
 	std::vector<Challenge> get_challenge_list() const;
-	void update_challenge(Challenge& challenge) const;
-	void send_hash_count(uint64_t hashes) const;
+	Challenge post_challenge(const Challenge& challenge) const;
+	void post_hash_count(uint64_t hashes) const;
 
 private:
 	void init_session(cpr::Session& session, const std::string& path) const;

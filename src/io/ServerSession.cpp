@@ -5,6 +5,7 @@
 #include <model/Configuration.h>
 #include <util/NonceUtil.h>
 #include <memory>
+#include <iostream>
 #include <nlohmann/json.hpp>
 
 using json = nlohmann::json;
@@ -36,14 +37,30 @@ std::vector<Challenge> ServerSession::get_challenge_list() const
 	return challenge_list;
 }
 
-void ServerSession::update_challenge(Challenge& challenge) const
+Challenge ServerSession::post_challenge(const Challenge& challenge) const
 {
 	cpr::Session session;
 	init_session(session, "/challenges/" + challenge.id());
-	(void) challenge;
+
+	session.SetOption(cpr::Header{{"Content-Type", "application/json"}}); //todo: this overrides the other headers :c
+	session.SetOption(cpr::Body{json(challenge).dump()});
+
+	auto response = session.Post();
+
+	if (response.status_code != 200) {
+		throw std::runtime_error("Error sending challenge to server.");
+	}
+
+	auto new_challenge = json::parse(response.text).get<Challenge>();
+	auto impl = SHA256ImplFactory::get_impl(m_config->impl());
+	if (!ChallengeValidator::validate(new_challenge, impl)) {
+		throw std::runtime_error("Server has an invalid solution.");
+	}
+
+	return new_challenge;
 }
 
-void ServerSession::send_hash_count(uint64_t hashes) const
+void ServerSession::post_hash_count(uint64_t hashes) const
 {
 	(void) hashes;
 }

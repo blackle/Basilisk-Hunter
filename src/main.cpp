@@ -44,12 +44,13 @@ int main(int argc, char** argv)
 	}
 
 	//todo: choose randomly
-	SharedChallenge shared_challenge(challenges.at(0));
+	Challenge challenge = challenges.at(0);
+	SharedChallenge shared_challenge(challenge);
 	{
 		std::lock_guard<std::mutex> lock(shared_challenge.mutex());
 		std::cout << "Running challenge id: " << shared_challenge.id(lock) << std::endl;
 		std::cout << "prefix: \"" << shared_challenge.prefix(lock) << "\" nonce_length: " << shared_challenge.nonce_length(lock) << std::endl;
-		std::cout << "best hash: " << shared_challenge.solution(lock).hash() << std::endl;
+		std::cout << "best server hash: " << shared_challenge.solution(lock).hash() << std::endl;
 	}
 
 	WorkerPool workers(&shared_challenge, config.get());
@@ -70,6 +71,18 @@ int main(int argc, char** argv)
 		if (new_solution != Solution::null()) {
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << new_solution.nonce() << " " << new_solution.hash() << std::endl;
+			try {
+				std::cout << "Sending new solution to server..." << std::endl;
+
+				challenge.set_solution(new_solution);
+				challenge = session.post_challenge(challenge);
+				new_solution = challenge.solution();
+				shared_challenge.reconcile_solutions(new_solution);
+
+				std::cout << "Done!" << std::endl;
+			} catch (const std::exception& e) {
+				std::cerr << e.what() << std::endl;
+			}
 		}
 
 		if (timer.elapsed<chrono::minutes>() > 5) {

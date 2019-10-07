@@ -19,11 +19,15 @@ CHALLENGES = [{
 
 class BasiliskRequestHandler(BaseHTTPRequestHandler):
 	def do_GET(self):
-		if self.path == "/challenges/" and self.command == "GET":
+		if self.path == "/challenges/":
 			self.do_challenge_list()
 			return
+
+		self.do_not_found()
+
+	def do_POST(self):
 		match = re.match(r"/challenges/(\w+)", self.path)
-		if match and self.command == "POST":
+		if match:
 			self.do_set_challenge(match.group(1))
 			return;
 
@@ -31,7 +35,6 @@ class BasiliskRequestHandler(BaseHTTPRequestHandler):
 
 	def do_not_found(self):
 		self.send_response(404)
-		self.send_header("Content-type", "application/json")
 		self.end_headers()
 
 	def do_challenge_list(self):
@@ -44,11 +47,10 @@ class BasiliskRequestHandler(BaseHTTPRequestHandler):
 		self.send_response(200)
 		self.send_header("Content-type", "application/json")
 		self.end_headers()
-		challenge = CHALLENGES[1]
-		json.loads(self.rfile.read())
-		self.wfile.write(str.encode(json.dumps(challenge)))
-
-
+		length = self.headers.get("Content-Length")
+		data = str(self.rfile.read(int(length)), "utf-8")
+		CHALLENGES[0] = json.loads(data) #echo
+		self.wfile.write(str.encode(json.dumps(CHALLENGES[0])))
 
 if __name__ == "__main__":
 	httpd = HTTPServer(("localhost", 8000), BasiliskRequestHandler)

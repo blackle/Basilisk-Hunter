@@ -6,7 +6,7 @@
 void to_json(json& j, const SHA256State& s) {
 	std::ostringstream os;
 	os << s;
-	j = json{os.str()};
+	j = os.str();
 }
 
 void from_json(const json& j, SHA256State& s) {
