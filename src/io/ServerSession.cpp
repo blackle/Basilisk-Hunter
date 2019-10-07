@@ -1,4 +1,6 @@
 #include "ServerSession.h"
+#include "ChallengeValidator.h"
+#include <crypto/SHA256ImplFactory.h>
 #include <json/Challenge_json.h>
 #include <model/Configuration.h>
 #include <util/NonceUtil.h>
@@ -22,8 +24,14 @@ std::vector<Challenge> ServerSession::get_challenge_list() const
 		throw std::runtime_error("Error getting challenge list from server.");
 	}
 
-	//todo: validate challenges here
 	auto challenge_list = json::parse(response.text).get<std::vector<Challenge>>();
+
+	auto impl = SHA256ImplFactory::get_impl(m_config->impl());
+	for (auto i = challenge_list.begin(); i != challenge_list.end(); i++) {
+		if (!ChallengeValidator::validate(*i, impl)) {
+			throw std::runtime_error("Server has an invalid solution.");
+		}
+	}
 
 	return challenge_list;
 }

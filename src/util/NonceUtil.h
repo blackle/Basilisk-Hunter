@@ -7,6 +7,7 @@
 class NonceUtil
 {
 public:
+	NonceUtil() = delete;
 	static std::string build(int length);
 	template<typename I, typename = std::enable_if<std::is_same<typename std::iterator_traits<I>::value_type, std::uint8_t>::value>>
 	static void increment(I begin, I end) {
