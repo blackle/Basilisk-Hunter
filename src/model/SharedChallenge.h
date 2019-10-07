@@ -5,7 +5,7 @@
 #include <string>
 #include <mutex>
 
-class SharedChallenge : public Challenge
+class SharedChallenge : protected Challenge
 {
 public:
 	SharedChallenge() = delete;
@@ -13,8 +13,13 @@ public:
 
 	std::mutex& mutex();
 
-	bool is_dirty() const;
-	void set_dirty(bool dirty);
+	const std::string& id(const std::lock_guard<std::mutex>&) const;
+	const std::string& prefix(const std::lock_guard<std::mutex>&) const;
+	unsigned nonce_length(const std::lock_guard<std::mutex>&) const;
+	const Solution& solution(const std::lock_guard<std::mutex>&) const;
+
+	Solution get_new_solution();
+	void reconcile_solutions(Solution& solution);
 
 private:
 	typedef Challenge super;

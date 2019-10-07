@@ -12,16 +12,6 @@
 
 namespace chrono = std::chrono;
 
-static Solution get_new_solution(SharedChallenge& challenge) {
-	std::lock_guard<std::mutex> lock(challenge.mutex());
-
-	if (challenge.is_dirty()) {
-		challenge.set_dirty(false);
-		return challenge.solution();
-	}
-	return Solution::null();
-}
-
 //todo: audit when we print to cout vs cerr, and when we should or shouldn't
 //todo: maybe make a configurable logger?
 int main(int argc, char** argv)
@@ -55,9 +45,12 @@ int main(int argc, char** argv)
 
 	//todo: choose randomly
 	SharedChallenge shared_challenge(challenges.at(0));
-	std::cout << "Running challenge id: " << shared_challenge.id() << std::endl;
-	std::cout << "prefix: " << shared_challenge.prefix() << " nonce_length: " << shared_challenge.nonce_length() << std::endl;
-	std::cout << "best hash: " << shared_challenge.solution().hash() << std::endl;
+	{
+		std::lock_guard<std::mutex> lock(shared_challenge.mutex());
+		std::cout << "Running challenge id: " << shared_challenge.id(lock) << std::endl;
+		std::cout << "prefix: \"" << shared_challenge.prefix(lock) << "\" nonce_length: " << shared_challenge.nonce_length(lock) << std::endl;
+		std::cout << "best hash: " << shared_challenge.solution(lock).hash() << std::endl;
+	}
 
 	WorkerPool workers(&shared_challenge, config.get());
 	HashSpeedometer speedometer(&workers);
@@ -73,7 +66,7 @@ int main(int argc, char** argv)
 		std::cout << "MH: " << static_cast<uint64_t>(workers.batches())*workers.batch_size() << std::endl;
 
 		//todo: send to server
-		auto new_solution = get_new_solution(shared_challenge);
+		auto new_solution = shared_challenge.get_new_solution();
 		if (new_solution != Solution::null()) {
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << new_solution.nonce() << " " << new_solution.hash() << std::endl;
