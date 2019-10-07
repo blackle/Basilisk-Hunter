@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 
+# todo: use flask!
+# todo: use sqlite!
+
 from http.server import BaseHTTPRequestHandler, HTTPServer
 import json
 import re

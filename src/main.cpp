@@ -4,11 +4,11 @@
 #include <basilisk/WorkerPool.h>
 #include <basilisk/HashSpeedometer.h>
 #include <io/ServerSession.h>
+#include <io/array_ios.h>
 #include <chrono>
 #include <iostream>
 #include <thread>
 #include <memory>
-#include <array_ios.h>
 
 namespace chrono = std::chrono;
 

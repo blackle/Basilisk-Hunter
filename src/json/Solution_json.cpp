@@ -1,6 +1,5 @@
 #include "Solution_json.h"
 #include "SHA256State_json.h"
-#include <array_ios.h>
 
 void to_json(json& j, const Solution& s) {
 	j = json{

@@ -1,8 +1,8 @@
 #include "SHA256Tester.h"
 #include "SHA256Impl.h"
+#include <io/array_ios.h>
 #include <chrono>
 #include <sstream>
-#include <array_ios.h>
 
 namespace chrono = std::chrono;
 
