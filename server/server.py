@@ -50,7 +50,7 @@ class BasiliskRequestHandler(BaseHTTPRequestHandler):
 		self.end_headers()
 		length = self.headers.get("Content-Length")
 		data = str(self.rfile.read(int(length)), "utf-8")
-		# CHALLENGES[0] = json.loads(data) #echo
+		CHALLENGES[0] = json.loads(data) #echo
 		self.wfile.write(str.encode(json.dumps(CHALLENGES[0])))
 
 if __name__ == "__main__":

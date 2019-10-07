@@ -75,7 +75,7 @@ int main(int argc, char** argv)
 
 				challenge = session.post_challenge(challenge);
 				new_solution = challenge.solution();
-				if (ChallengeOperations::reconcile_solutions(&challenge_box, new_solution)) { //todo: fix me
+				if (!ChallengeOperations::reconcile_solutions(&challenge_box, new_solution)) {
 					std::cout << "Our solution was the winner!" << std::endl;
 				}
 
