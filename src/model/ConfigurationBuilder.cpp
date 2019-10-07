@@ -2,6 +2,7 @@
 #include "Configuration.h"
 #include <io/ArgumentParser.h>
 #include <crypto/SHA256ImplFactory.h>
+#include <crypto/SHA256Impl.h>
 #include <stdexcept>
 #include <iostream>
 

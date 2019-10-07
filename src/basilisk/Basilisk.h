@@ -19,8 +19,8 @@ public:
 
 private:
 	const SHA256Impl* m_sha;
-	std::string m_challenge;
 	int m_nonce_length;
+	std::string m_challenge;
 
 	SHA256State m_ctx_initial;
 	SHA256State m_ctx_working;

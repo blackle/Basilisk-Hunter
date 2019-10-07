@@ -3,7 +3,6 @@
 #include <crypto/SHA256State.h>
 #include "Solution.h"
 
-//todo: make more like Configuration class with setters and default constructor
 class Challenge {
 public:
 	Challenge();

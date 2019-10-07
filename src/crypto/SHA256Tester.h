@@ -1,5 +1,6 @@
 #pragma once
-#include "SHA256Impl.h"
+
+class SHA256Impl;
 
 class SHA256Tester
 {

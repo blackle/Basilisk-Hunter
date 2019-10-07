@@ -9,7 +9,7 @@ class SharedChallenge : protected Challenge
 {
 public:
 	SharedChallenge() = delete;
-	SharedChallenge(const Challenge& challenge);
+	explicit SharedChallenge(const Challenge& challenge);
 
 	std::mutex& mutex();
 

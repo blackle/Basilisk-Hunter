@@ -1,4 +1,5 @@
 #include "SHA256ImplFactory.h"
+#include "SHA256Impl.h"
 #include "SHA256Tester.h"
 #include "impl/SHA256Impl_Naive.h"
 #include "impl/SHA256Impl_SSE4.h"
@@ -14,7 +15,7 @@ static void test_impl(std::string& best_name, int& best_time)
 	T impl;
 	if (impl.supported() && SHA256Tester::verify(&impl)) {
 		auto benchmark = SHA256Tester::benchmark(&impl);
-		std::cout << T::name() << " " << benchmark << std::endl;
+		std::cout << "Benchmarked " << T::name() << ": " << benchmark << " seconds" << std::endl;
 		if (benchmark < best_time || best_time < 0) {
 			best_name = T::name();
 			best_time = benchmark;

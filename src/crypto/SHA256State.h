@@ -8,7 +8,7 @@ class SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
 {
 public:
 	SHA256State();
-	SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init);
+	explicit SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init);
 	void reset();
 
 private:

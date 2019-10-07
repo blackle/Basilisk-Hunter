@@ -1,7 +1,8 @@
 #pragma once
 
-#include "SHA256Impl.h"
 #include <string>
+
+class SHA256Impl;
 
 class SHA256ImplFactory {
 public:

@@ -6,8 +6,8 @@ constexpr unsigned MIN_ENTROPY_BYTES = 11; //~64 bits is probably enough entropy
 Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned nonce_length)
 	: m_sha(sha)
 	, m_nonce_length(nonce_length)
+	, m_challenge(prefix + NonceUtil::build(nonce_length))
 {
-	m_challenge = prefix + NonceUtil::build(nonce_length);
 
 	auto residual = m_sha->hash_to_padding(&m_ctx_initial, m_challenge);
 

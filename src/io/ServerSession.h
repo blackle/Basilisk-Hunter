@@ -10,7 +10,7 @@ class Configuration;
 class ServerSession
 {
 public:
-	ServerSession(const Configuration* config);
+	explicit ServerSession(const Configuration* config);
 
 	std::vector<Challenge> get_challenge_list() const;
 	void update_challenge(Challenge& challenge) const;

@@ -5,7 +5,7 @@ class Batcher;
 
 class HashSpeedometer {
 public:
-	HashSpeedometer(const Batcher* batcher);
+	explicit HashSpeedometer(const Batcher* batcher);
 
 	void start();
 
