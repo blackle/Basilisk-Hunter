@@ -8,10 +8,7 @@ public:
 	Solution();
 	Solution(const SHA256State& hash, const std::string& nonce);
 
-	void set_hash(const SHA256State& hash);
 	const SHA256State& hash() const;
-
-	void set_nonce(const std::string& nonce);
 	const std::string& nonce() const;
 
 private:

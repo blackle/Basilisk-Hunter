@@ -10,6 +10,5 @@ void to_json(json& j, const Solution& s) {
 }
 
 void from_json(const json& j, Solution& s) {
-	s.set_hash(j.at("hash"));
-	s.set_nonce(j.at("nonce"));
+	s = Solution(j.at("hash"), j.at("nonce"));
 }
