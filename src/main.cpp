@@ -64,22 +64,21 @@ int main(int argc, char** argv)
 		std::this_thread::sleep_for(chrono::seconds(10));
 
 		std::cout << "MH/s: " << speedometer.million_hashes_per_second() << std::endl;
-		std::cout << "MH: " << static_cast<uint64_t>(workers.batches())*workers.batch_size() << std::endl;
 
-		//todo: send to server
 		auto new_solution = shared_challenge.get_new_solution();
 		if (new_solution != Solution::null()) {
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << new_solution.nonce() << " " << new_solution.hash() << std::endl;
+
 			try {
 				std::cout << "Sending new solution to server..." << std::endl;
 
 				challenge.set_solution(new_solution);
 				challenge = session.post_challenge(challenge);
-				new_solution = challenge.solution();
+				new_solution = challenge.solution(); //todo: this is mildly annoying...
 				shared_challenge.reconcile_solutions(new_solution);
 
-				std::cout << "Done!" << std::endl;
+				std::cout << "Solution sent!" << std::endl;
 			} catch (const std::exception& e) {
 				std::cerr << e.what() << std::endl;
 			}
@@ -87,6 +86,7 @@ int main(int argc, char** argv)
 
 		if (timer.elapsed<chrono::minutes>() > 5) {
 			//todo: report number of hashes computed every 5 minutes
+			timer.start();
 		}
 	}
 

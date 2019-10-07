@@ -44,6 +44,7 @@ class BasiliskRequestHandler(BaseHTTPRequestHandler):
 		self.wfile.write(str.encode(json.dumps(CHALLENGES)))
 
 	def do_set_challenge(self, id):
+		global CHALLENGES
 		self.send_response(200)
 		self.send_header("Content-type", "application/json")
 		self.end_headers()
