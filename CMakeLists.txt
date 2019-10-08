@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory(json)
-
 set(BUILD_CPR_TESTS OFF)
 set(CURL_STATICLIB ON)
 add_subdirectory(cpr)
@@ -12,6 +9,7 @@ include_directories(${CPR_INCLUDE_DIRS})
 
 message(${CMAKE_SYSTEM_PROCESSOR})
 
+include_directories(include)
 include_directories(argagg)
 include_directories(src)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h" "src/*.c")
@@ -50,6 +48,6 @@ find_package(Threads REQUIRED)
 set(CMAKE_CXX_STANDARD 11)
 
 add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
-target_link_libraries(basilisk_hunter Threads::Threads cpu_features ${CPR_LIBRARIES} nlohmann_json::nlohmann_json)
+target_link_libraries(basilisk_hunter Threads::Threads cpu_features ${CPR_LIBRARIES})
 set(CMAKE_CXX_FLAGS "-O3 -Wall -Wextra -Werror -flto")
 set(CMAKE_EXE_LINKER_FLAGS "-flto")
