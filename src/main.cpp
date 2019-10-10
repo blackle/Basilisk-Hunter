@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 	while (true) {
 		speedometer.start();
 
-		std::this_thread::sleep_for(chrono::seconds(1));
+		std::this_thread::sleep_for(chrono::seconds(10));
 
 		std::cout << "MH/s: " << speedometer.million_hashes_per_second() << std::endl;
 
