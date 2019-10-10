@@ -1,5 +1,6 @@
 #pragma once
 
+#include <string>
 #include <crypto/SHA256State.h>
 
 class Solution
