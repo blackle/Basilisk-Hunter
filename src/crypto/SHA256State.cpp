@@ -15,3 +15,10 @@ void SHA256State::reset()
 {
 	std::copy(sha256_h0.begin(), sha256_h0.end(), begin());
 }
+
+bool operator<(const SHA256State& a, const SHA256State& b)
+{
+	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
+	//compare first bytes first, because that will be fast
+	return a.data()[0] <= b.data()[0] && static_cast<const super&>(a) < static_cast<const super&>(b);
+}

@@ -14,3 +14,5 @@ public:
 private:
 	typedef std::array<uint32_t, SHA256_STATE_SIZE> super;
 };
+
+bool operator<(const SHA256State& a, const SHA256State& b);
