@@ -22,6 +22,8 @@ ArgumentParser::ArgumentParser() : m_parser({{
 	  "Sets the SHA256 compression function implementation (default: chosen automatically)", 1},
 	{ "list-impls", {"--list-impls"},
 	  "Lists the supported SHA256 compression function implementations", 0},
+	{ "offline", {"--offline"},
+	  "Use default challenge instead of contacting server", 0},
 }})
 {}
 
@@ -50,6 +52,7 @@ Configuration* ArgumentParser::parse(int argc, char** argv) const
 	config->set_impl(args["impl"].as<std::string>(""));
 	config->set_server(args["server"].as<std::string>(DEFAULT_SERVER_DOMAIN));
 	config->set_limit(args["limit"].as<float>(0));
+	config->set_offline(args["offline"]);
 	return config;
 }
 

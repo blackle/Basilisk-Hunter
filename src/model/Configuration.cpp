@@ -6,6 +6,7 @@ Configuration::Configuration()
 	: m_threads(0)
 	, m_limit(0)
 	, m_batch_size(DEFAULT_BATCH_SIZE)
+	, m_offline(false)
 {}
 
 void Configuration::set_impl(const std::string& impl)
@@ -66,4 +67,14 @@ void Configuration::set_batch_size(unsigned batch_size)
 unsigned Configuration::batch_size() const
 {
 	return m_batch_size;
+}
+
+void Configuration::set_offline(bool offline)
+{
+	m_offline = offline;
+}
+
+bool Configuration::offline() const
+{
+	return m_offline;
 }

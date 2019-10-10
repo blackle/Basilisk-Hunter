@@ -35,21 +35,25 @@ int main(int argc, char** argv)
 		std::cout << "Rate limiting to " << config->limit() << " MH/s" << std::endl;
 	}
 
-	std::cout << "Contacting server..." << std::endl;
-	ServerSession session(config.get());
 	std::vector<Challenge> challenges;
-	try {
-		challenges = session.get_challenge_list();
-	} catch (const std::exception& e) {
-		std::cerr << e.what() << std::endl;
-		return EXIT_FAILURE;
+	ServerSession session(config.get());
+	if (config->offline()) {
+		challenges.push_back(Challenge("default_offline", "basilisk:0000000000:", 64));
+	} else {
+		std::cout << "Contacting server..." << std::endl;
+		try {
+			challenges = session.get_challenge_list();
+		} catch (const std::exception& e) {
+			std::cerr << e.what() << std::endl;
+			return EXIT_FAILURE;
+		}
 	}
 
 	//todo: choose randomly
 	Challenge challenge = challenges.at(0);
-	std::cout << "Running challenge id: " << challenge.id() << std::endl;
+	std::cout << "Running challenge id: \"" << challenge.id() << "\"" << std::endl;
 	std::cout << "prefix: \"" << challenge.prefix() << "\" nonce_length: " << challenge.nonce_length() << std::endl;
-	std::cout << "best server hash: " << challenge.solution().hash() << std::endl;
+	std::cout << "best hash: " << challenge.solution().hash() << std::endl;
 
 	LockBox<Challenge> challenge_box(challenge);
 	WorkerPool workers(&challenge_box, config.get());
@@ -70,18 +74,20 @@ int main(int argc, char** argv)
 			std::cout << "New lowest nonce found:" << std::endl;
 			std::cout << new_solution.nonce() << " " << new_solution.hash() << std::endl;
 
-			try {
-				std::cout << "Sending new solution to server..." << std::endl;
+			if (!config->offline()) {
+				try {
+					std::cout << "Sending new solution to server..." << std::endl;
 
-				challenge = session.post_challenge(challenge);
-				new_solution = challenge.solution();
-				if (!ChallengeOperations::reconcile_solutions(&challenge_box, new_solution)) {
-					std::cout << "Our solution was the winner!" << std::endl;
+					challenge = session.post_challenge(challenge);
+					new_solution = challenge.solution();
+					if (!ChallengeOperations::reconcile_solutions(&challenge_box, new_solution)) {
+						std::cout << "Our solution was the winner!" << std::endl;
+					}
+
+					std::cout << "Solution sent!" << std::endl;
+				} catch (const std::exception& e) {
+					std::cerr << e.what() << std::endl;
 				}
-
-				std::cout << "Solution sent!" << std::endl;
-			} catch (const std::exception& e) {
-				std::cerr << e.what() << std::endl;
 			}
 		}
 

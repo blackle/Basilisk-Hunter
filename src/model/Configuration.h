@@ -24,6 +24,9 @@ public:
 	void set_batch_size(unsigned batch_size);
 	unsigned batch_size() const;
 
+	void set_offline(bool offline);
+	bool offline() const;
+
 private:
 	std::string m_impl;
 	unsigned m_threads;
@@ -31,4 +34,5 @@ private:
 	std::string m_server;
 	float m_limit;
 	unsigned m_batch_size;
+	bool m_offline;
 };
