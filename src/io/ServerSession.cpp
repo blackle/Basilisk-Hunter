@@ -9,6 +9,7 @@
 #include <memory>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include <version.h>
 
 using json = nlohmann::json;
 
@@ -71,11 +72,10 @@ void ServerSession::post_hash_count(uint64_t hashes) const
 
 cpr::Header ServerSession::default_headers() const
 {
-	//todo: set user agent to string based on version
 	return cpr::Header{
 		{"Basilisk-Session-Key", m_session_key},
 		{"Basilisk-User-Name", QEncoder::encode_utf8(m_config->name())},
-		{"User-Agent", "basilisk-client/0.0.0"}
+		{"User-Agent", USER_AGENT_STRING}
 	};
 }
 

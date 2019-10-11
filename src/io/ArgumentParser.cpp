@@ -1,6 +1,7 @@
 #include "ArgumentParser.h"
 #include <model/Configuration.h>
 #include <iostream>
+#include <version.h>
 
 //weh, I wanted to use constexpr for this whole thing!
 #define DEFAULT_SERVER_DOMAIN "http://basilisk.suricrasia.online/"
@@ -37,7 +38,7 @@ Configuration* ArgumentParser::parse(int argc, char** argv) const
 	}
 
 	if (args["version"]) {
-		print_help_message(argv[0]); //todo: print version string
+		print_version_string();
 		return nullptr;
 	}
 
@@ -58,9 +59,14 @@ Configuration* ArgumentParser::parse(int argc, char** argv) const
 
 void ArgumentParser::print_help_message(const std::string& program_name) const
 {
-	std::cerr << "Usage: " << program_name << " [OPTIONS]..." << std::endl;
-	std::cerr << "A networked program to search for strings that hash to small values." << std::endl;
-	std::cerr << std::endl;
-	std::cerr << "Options:" << std::endl;
-	std::cerr << m_parser << std::endl;
+	std::cout << "Usage: " << program_name << " [OPTIONS]..." << std::endl;
+	std::cout << "A networked program to search for strings that hash to small values." << std::endl;
+	std::cout << std::endl;
+	std::cout << "Options:" << std::endl;
+	std::cout << m_parser << std::endl;
+}
+
+void ArgumentParser::print_version_string() const
+{
+	std::cout << VERSION_STRING << std::endl;
 }
