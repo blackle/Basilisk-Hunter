@@ -5,5 +5,5 @@ ElapsedTimer::ElapsedTimer() {
 }
 
 void ElapsedTimer::start() {
-	m_start = std::chrono::system_clock::now();
+	m_start = std::chrono::steady_clock::now();
 }

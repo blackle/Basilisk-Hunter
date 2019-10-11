@@ -26,11 +26,11 @@ int SHA256Tester::benchmark(const SHA256Impl* impl)
 	SHA256State state;
 	SHA256Block block("", 0);
 
-	chrono::time_point<chrono::system_clock> start = chrono::system_clock::now();
+	chrono::time_point<chrono::steady_clock> start = chrono::steady_clock::now();
 	for (int i = 0; i < BENCHMARK_ROUNDS; i++) {
 		impl->calc_block(&state, &block);
 	}
-	chrono::time_point<chrono::system_clock> stop = chrono::system_clock::now();
+	chrono::time_point<chrono::steady_clock> stop = chrono::steady_clock::now();
 
 	return chrono::duration_cast<chrono::milliseconds>(stop - start).count();
 }
