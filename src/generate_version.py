@@ -10,6 +10,8 @@ const std::string USER_AGENT_STRING("{1}");
 """
 
 def get_git_version(git_exe):
+	if not git_exe:
+		return ""
 	try:
 		git_hash = subprocess.check_output([git_exe, "rev-parse", "--short", "HEAD"])
 		git_hash = git_hash.decode("utf-8").rstrip()

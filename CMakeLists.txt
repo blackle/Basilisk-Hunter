@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
-
+#todo: modularize the cmake file
 set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (VERSION_PATCH 0)
@@ -11,8 +11,6 @@ set(CURL_STATICLIB ON)
 add_subdirectory(cpr)
 include_directories(${CPR_INCLUDE_DIRS})
 
-message(${CMAKE_SYSTEM_PROCESSOR})
-
 include_directories(include)
 include_directories(src)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h" "src/*.c")
@@ -21,11 +19,16 @@ find_package(Git)
 find_program(PYTHON_EXE NAMES python3)
 set(VERSION_CPP_FILE "${PROJECT_BINARY_DIR}/src/version.cpp")
 set(VERSION_GENERATOR_SCRIPT "${PROJECT_SOURCE_DIR}/src/generate_version.py")
+set(VERSION_DEPENDS ${VERSION_GENERATOR_SCRIPT} ${SOURCES})
+set(GIT_INDEX "${PROJECT_SOURCE_DIR}/.git/index")
+if(EXISTS GIT_INDEX)
+	set(VERSION_DEPENDS GIT_INDEX ${VERSION_DEPENDS})
+endif()
 add_custom_command(
 	OUTPUT ${VERSION_CPP_FILE}
 	COMMAND ${PYTHON_EXE}
 	ARGS ${VERSION_GENERATOR_SCRIPT} ${VERSION_CPP_FILE} ${CMAKE_PROJECT_NAME} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ${GIT_EXECUTABLE}
-	DEPENDS "${PROJECT_SOURCE_DIR}/.git/index" ${VERSION_GENERATOR_SCRIPT} ${SOURCES})
+	DEPENDS ${VERSION_DEPENDS})
 set(SOURCES ${VERSION_CPP_FILE} ${SOURCES})
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
