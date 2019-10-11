@@ -19,26 +19,26 @@ Basilisk::Basilisk(const SHA256Impl* sha, const std::string& prefix, unsigned no
 		throw std::runtime_error("Not enough entropy in last block");
 	}
 
-	m_block_nonce.reset(new SHA256Block(residual, m_challenge.length()));
-	m_block_final.reset(new SHA256Block(32,32));
+	m_block_nonce = SHA256Block(residual, m_challenge.length());
+	m_block_final = SHA256Block(32,32);
 }
 
 void Basilisk::step()
 {
-	NonceUtil::increment(m_block_nonce->begin(), m_block_nonce->end());
+	NonceUtil::increment(m_block_nonce.begin(), m_block_nonce.end());
 
 	m_ctx_working = m_ctx_initial;
-	m_sha->calc_block(&m_ctx_working, m_block_nonce.get());
+	m_sha->calc_block(&m_ctx_working, &m_block_nonce);
 
-	SHA256Impl::copy_state_into_block(&m_ctx_working, m_block_final.get());
+	SHA256Impl::copy_state_into_block(&m_ctx_working, &m_block_final);
 
 	m_ctx_final.reset();
-	m_sha->calc_block(&m_ctx_final, m_block_final.get());
+	m_sha->calc_block(&m_ctx_final, &m_block_final);
 }
 
 std::string Basilisk::challenge()
 {
-	std::copy(m_block_nonce->begin(), m_block_nonce->content_end(), m_challenge.end()-m_block_nonce->content_length());
+	std::copy(m_block_nonce.begin(), m_block_nonce.content_end(), m_challenge.end()-m_block_nonce.content_length());
 	return m_challenge;
 }
 

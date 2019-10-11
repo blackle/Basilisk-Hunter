@@ -15,6 +15,10 @@ static constexpr std::array<uint8_t, 8> pack_64(uint64_t num) {
 	};
 }
 
+SHA256Block::SHA256Block()
+	: SHA256Block("", 0)
+{}
+
 SHA256Block::SHA256Block(const std::string& data)
 {
 	m_content_end = data.length();

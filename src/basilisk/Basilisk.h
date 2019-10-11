@@ -4,7 +4,6 @@
 #include <crypto/SHA256Block.h>
 #include <crypto/SHA256Impl.h>
 #include <string>
-#include <memory>
 
 class Basilisk {
 public:
@@ -26,6 +25,6 @@ private:
 	SHA256State m_ctx_working;
 	SHA256State m_ctx_final;
 
-	std::unique_ptr<SHA256Block> m_block_nonce;
-	std::unique_ptr<SHA256Block> m_block_final;
+	SHA256Block m_block_nonce;
+	SHA256Block m_block_final;
 };
