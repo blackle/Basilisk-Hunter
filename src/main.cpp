@@ -10,9 +10,24 @@
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <atomic>
 #include <memory>
+#include <csignal>
+#include <cstdlib>
 
 namespace chrono = std::chrono;
+
+//todo: put in its own class and make cross platform
+static std::atomic_bool RUNNING(true);
+
+static void interrupt_handler(int signal)
+{
+	if (RUNNING == false) {
+		exit(signal);
+	}
+	std::cout << "Shutting down..." << std::endl;
+	RUNNING = false;
+}
 
 //todo: audit when we print to cout vs cerr, and when we should or shouldn't
 //todo: maybe make a configurable logger? we should print out the program name on each line of std::cerr
@@ -60,10 +75,11 @@ int main(int argc, char** argv)
 	HashSpeedometer speedometer(&workers);
 	ElapsedTimer timer;
 
-	//todo: graceful exit on ctrl+c
-	while (true) {
+	std::signal(SIGINT, interrupt_handler);
+	while (RUNNING) {
 		speedometer.start();
 
+		//todo: bail out faster on ctrl+c
 		std::this_thread::sleep_for(chrono::seconds(10));
 
 		std::cout << "MH/s: " << speedometer.million_hashes_per_second() << std::endl;
