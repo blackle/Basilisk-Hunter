@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 import sys
+import os
 import subprocess
 
 TEMPLATE = """
@@ -36,5 +37,6 @@ if __name__ == "__main__":
 		version_string += hash_string
 		user_agent += hash_string
 
+	os.makedirs(os.path.dirname(output_path), exist_ok=True)
 	with open(output_path, 'w') as output_file:
 		output_file.write(TEMPLATE.format(version_string, user_agent))
