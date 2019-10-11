@@ -2,10 +2,11 @@
 
 #include <string>
 #include <array>
+#include "alignment.h"
 
 constexpr unsigned SHA256_BLOCK_SIZE = 64;
 
-class SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
+class CRYPTO_ALIGNMENT SHA256Block : public std::array<uint8_t, SHA256_BLOCK_SIZE>
 {
 public:
 	explicit SHA256Block(const std::string& data);

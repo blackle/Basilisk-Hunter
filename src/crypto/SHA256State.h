@@ -1,10 +1,11 @@
 #pragma once
 
 #include <array>
+#include "alignment.h"
 
 constexpr unsigned SHA256_STATE_SIZE = 8;
 
-class SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
+class CRYPTO_ALIGNMENT SHA256State : public std::array<uint32_t, SHA256_STATE_SIZE>
 {
 public:
 	SHA256State();
