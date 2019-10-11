@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.1)
 project (basilisk_hunter C CXX ASM)
 add_subdirectory(cpu_features)
 
+set (VERSION_MAJOR 0)
+set (VERSION_MINOR 1)
+set (VERSION_PATCH 0)
+
 set(BUILD_CPR_TESTS OFF)
 set(CURL_STATICLIB ON)
 add_subdirectory(cpr)
@@ -12,6 +16,17 @@ message(${CMAKE_SYSTEM_PROCESSOR})
 include_directories(include)
 include_directories(src)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h" "src/*.c")
+
+find_package(Git)
+find_program(PYTHON_EXE NAMES python3)
+set(VERSION_CPP_FILE "${PROJECT_BINARY_DIR}/src/version.cpp")
+set(VERSION_GENERATOR_SCRIPT "${PROJECT_SOURCE_DIR}/src/generate_version.py")
+add_custom_command(
+	OUTPUT ${VERSION_CPP_FILE}
+	COMMAND ${PYTHON_EXE}
+	ARGS ${VERSION_GENERATOR_SCRIPT} ${VERSION_CPP_FILE} ${CMAKE_PROJECT_NAME} "${VERSION_MAJOR}.${VERSION_MINOR}.${VERSION_PATCH}" ${GIT_EXECUTABLE}
+	DEPENDS "${PROJECT_SOURCE_DIR}/.git/index" ${VERSION_GENERATOR_SCRIPT})
+set(SOURCES ${VERSION_CPP_FILE} ${SOURCES})
 
 if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "x86_64")
 find_program(YASM_EXE NAMES yasm)
@@ -34,7 +49,8 @@ foreach(YASM_SOURCE ${YASM_SOURCES})
 	add_custom_command(
 		OUTPUT ${YASM_OBJECT}
 		COMMAND ${YASM_EXE}
-		ARGS ${YASM_ARGS} -o ${YASM_OBJECT} ${YASM_SOURCE} )
+		ARGS ${YASM_ARGS} -o ${YASM_OBJECT} ${YASM_SOURCE}
+		MAIN_DEPENDENCY ${YASM_SOURCE} )
 endforeach()
 endif()
 

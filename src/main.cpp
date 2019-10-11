@@ -112,6 +112,7 @@ int main(int argc, char** argv)
 			timer.start();
 		}
 	}
+	//todo: report hashes computed on exit
 
 	return EXIT_SUCCESS;
 }
