@@ -10,7 +10,7 @@ public:
 	virtual ~RateLimitedWorker();
 
 protected:
-	virtual void do_batch() override;
+	virtual bool do_batch() override;
 
 private:
 	typedef Worker super;

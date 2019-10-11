@@ -11,10 +11,7 @@ WorkerPool::WorkerPool(LockBox<Challenge>* box, const Configuration* config)
 		Worker* worker = WorkerBuilder::build(box, config);
 		m_workers.push_back(worker);
 		worker->setThread(new std::thread([worker] {
-			//todo: we need to be able to terminate this thread, the WorkerPool destructor will just cause a SIGABRT
-			while (true) {
-				worker->do_batch();
-			}
+			while (worker->do_batch());
 		}));
 	}
 }
@@ -23,6 +20,7 @@ WorkerPool::~WorkerPool()
 {
 	for (auto i = m_workers.begin(); i != m_workers.end(); i++) {
 		auto worker = *i;
+		worker->terminate();
 		delete worker;
 	}
 }

@@ -9,6 +9,7 @@ Worker::Worker(LockBox<Challenge>* box, const Configuration* config)
 	: m_batches(0)
 	, m_batch_size(config->batch_size())
 	, m_box(box)
+	, m_running(true)
 {
 	const Unlocker<Challenge> challenge(m_box);
 	m_sha.reset(SHA256ImplFactory::get_impl(config->impl()));
@@ -34,7 +35,12 @@ std::shared_ptr<std::thread> Worker::thread() {
 	return m_thread;
 }
 
-void Worker::do_batch() {
+void Worker::terminate() {
+	m_running = false;
+	m_thread->join();
+}
+
+bool Worker::do_batch() {
 	for (unsigned i = 0; i < m_batch_size; i++) {
 		m_basilisk->step();
 
@@ -45,4 +51,5 @@ void Worker::do_batch() {
 		}
 	}
 	m_batches++;
+	return m_running;
 }

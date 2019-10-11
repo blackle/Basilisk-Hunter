@@ -23,10 +23,11 @@ public:
 
 	void setThread(std::thread* thread);
 	std::shared_ptr<std::thread> thread();
+	void terminate();
 
 protected:
 	friend class WorkerPool;
-	virtual void do_batch();
+	virtual bool do_batch();
 
 private:
 
@@ -39,4 +40,5 @@ private:
 	LockBox<Challenge>* m_box;
 
 	std::shared_ptr<std::thread> m_thread;
+	std::atomic_bool m_running;
 };
