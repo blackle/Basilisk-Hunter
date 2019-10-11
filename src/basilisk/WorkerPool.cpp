@@ -3,23 +3,25 @@
 #include "WorkerBuilder.h"
 #include <model/Configuration.h>
 #include <thread>
+#include <numeric>
+#include <algorithm>
 
 WorkerPool::WorkerPool(LockBox<Challenge>* box, const Configuration* config)
 	: m_batch_size(config->batch_size())
 {
-	for (unsigned i = 0; i < config->threads(); i++) {
+	std::generate_n(std::back_inserter(m_workers), config->threads(), [box, config] {
 		Worker* worker = WorkerBuilder::build(box, config);
-		m_workers.push_back(worker);
+		//todo: make WorkerThread to hide this
 		worker->setThread(new std::thread([worker] {
 			while (worker->do_batch());
 		}));
-	}
+		return worker;
+	});
 }
 
 WorkerPool::~WorkerPool()
 {
-	for (auto i = m_workers.begin(); i != m_workers.end(); i++) {
-		auto worker = *i;
+	for (auto *worker : m_workers) {
 		worker->terminate();
 		delete worker;
 	}
@@ -27,12 +29,11 @@ WorkerPool::~WorkerPool()
 
 unsigned WorkerPool::batches() const
 {
-	unsigned sum = 0;
-	for (auto i = m_workers.begin(); i != m_workers.end(); i++) {
-		auto worker = *i;
-		sum += worker->batches();
-	}
-	return sum;
+	return std::accumulate(m_workers.begin(), m_workers.end(), 0,
+		[](unsigned sum, const Worker* worker) {
+			return sum + worker->batches();
+		}
+	);
 }
 
 unsigned WorkerPool::batch_size() const
