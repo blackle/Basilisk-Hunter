@@ -1,8 +1,6 @@
 #include "ServerSession.h"
 #include "ChallengeValidator.h"
 #include "QEncoder.h"
-#include <crypto/SHA256ImplFactory.h>
-#include <crypto/SHA256Impl.h>
 #include <json/Challenge_json.h>
 #include <model/Configuration.h>
 #include <util/NonceUtil.h>
@@ -31,9 +29,9 @@ std::vector<Challenge> ServerSession::get_challenge_list() const
 
 	auto challenge_list = json::parse(response.text).get<std::vector<Challenge>>();
 
-	std::unique_ptr<const SHA256Impl> impl(SHA256ImplFactory::get_impl(m_config->impl()));
-	for (auto i = challenge_list.begin(); i != challenge_list.end(); i++) {
-		if (!ChallengeValidator::validate(*i, impl.get())) {
+	ChallengeValidator validator(m_config);
+	for (const auto &challenge : challenge_list) {
+		if (!validator.validate(challenge)) {
 			throw std::runtime_error("Server has an invalid solution.");
 		}
 	}
@@ -57,8 +55,8 @@ Challenge ServerSession::post_challenge(const Challenge& challenge) const
 	}
 
 	auto new_challenge = json::parse(response.text).get<Challenge>();
-	auto impl = SHA256ImplFactory::get_impl(m_config->impl());
-	if (!ChallengeValidator::validate(new_challenge, impl)) {
+	ChallengeValidator validator(m_config);
+	if (!validator.validate(new_challenge)) {
 		throw std::runtime_error("Server has an invalid solution.");
 	}
 

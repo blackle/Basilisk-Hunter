@@ -1,13 +1,20 @@
 #include "ChallengeValidator.h"
 #include <model/Challenge.h>
+#include <model/Configuration.h>
+#include <crypto/SHA256ImplFactory.h>
 #include <crypto/SHA256Impl.h>
 #include <basilisk/Basilisk.h>
 #include <iostream>
 
-bool ChallengeValidator::validate(const Challenge& challenge, const SHA256Impl* sha)
+ChallengeValidator::ChallengeValidator(const Configuration* config)
+	: m_config(config)
+	, m_sha(SHA256ImplFactory::get_impl(m_config->impl()))
+{}
+
+bool ChallengeValidator::validate(const Challenge& challenge)
 {
 	try {
-		Basilisk b(sha, challenge.prefix(), challenge.nonce_length());
+		Basilisk b(m_sha.get(), challenge.prefix(), challenge.nonce_length());
 	} catch (const std::exception& e) {
 		std::cerr << e.what() << std::endl;
 		return false;
@@ -17,7 +24,7 @@ bool ChallengeValidator::validate(const Challenge& challenge, const SHA256Impl* 
 		return true;
 	}
 
-	auto hash = sha->double_hash(challenge.prefix() + challenge.solution().nonce());
+	auto hash = m_sha->double_hash(challenge.prefix() + challenge.solution().nonce());
 	if (hash != challenge.solution().hash()) {
 		std::cerr << "Solution hash does not match server's hash" << std::endl;
 		return false;

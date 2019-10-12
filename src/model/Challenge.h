@@ -1,6 +1,5 @@
 #pragma once
 
-#include <crypto/SHA256State.h>
 #include "Solution.h"
 
 class Challenge {

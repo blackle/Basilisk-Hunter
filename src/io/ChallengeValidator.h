@@ -1,11 +1,18 @@
 #pragma once
 
+#include <memory>
+
+#include <crypto/SHA256Impl.h>
+
+class Configuration;
 class Challenge;
-class SHA256Impl;
 
 class ChallengeValidator
 {
 public:
-	ChallengeValidator() = delete;
-	static bool validate(const Challenge& challenge, const SHA256Impl* sha);
+	ChallengeValidator(const Configuration* config);
+	bool validate(const Challenge& challenge);
+private:
+	const Configuration* m_config;
+	std::unique_ptr<const SHA256Impl> m_sha;
 };
