@@ -57,3 +57,30 @@ const SHA256Impl* SHA256ImplFactory::get_impl(const std::string& impl_name)
 	set_impl<SHA256Impl_ARMv8>   (impl, impl_name);
 	return impl;
 }
+
+template <typename T>
+void add_impl(std::vector<SHA256ImplMetadata>& md_list)
+{
+	SHA256ImplMetadata md;
+	md.set_name(T::name());
+	T impl;
+	if (impl.supported()) {
+		md.set_supported(true);
+		md.set_working(SHA256Tester::verify(&impl));
+	}
+	md_list.push_back(md);
+}
+
+std::vector<SHA256ImplMetadata> SHA256ImplFactory::impl_list()
+{
+	std::vector<SHA256ImplMetadata> md_list;
+
+	add_impl<SHA256Impl_Naive>    (md_list);
+	add_impl<SHA256Impl_SSE4>     (md_list);
+	add_impl<SHA256Impl_AVX1>     (md_list);
+	add_impl<SHA256Impl_AVX2>     (md_list);
+	add_impl<SHA256Impl_ISHAExt>  (md_list);
+	add_impl<SHA256Impl_ARMv8>    (md_list);
+
+	return md_list;
+}

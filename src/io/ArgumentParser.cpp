@@ -1,5 +1,6 @@
 #include "ArgumentParser.h"
 #include <model/Configuration.h>
+#include <crypto/SHA256ImplFactory.h>
 #include <iostream>
 #include <version.h>
 
@@ -43,7 +44,7 @@ Configuration* ArgumentParser::parse(int argc, char** argv) const
 	}
 
 	if (args["list-impls"]) {
-		print_help_message(argv[0]); //todo: list impls
+		print_impls();
 		return nullptr;
 	}
 
@@ -69,4 +70,14 @@ void ArgumentParser::print_help_message(const std::string& program_name) const
 void ArgumentParser::print_version_string() const
 {
 	std::cout << VERSION_STRING << std::endl;
+}
+
+void ArgumentParser::print_impls() const
+{
+	auto impl_list = SHA256ImplFactory::impl_list();
+
+	std::cout << "Name\tSupported?\tWorking?" << std::endl;
+	for (const SHA256ImplMetadata& md : impl_list) {
+		std::cout << md << std::endl;
+	}
 }

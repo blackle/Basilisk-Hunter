@@ -12,5 +12,6 @@ public:
 private:
 	void print_help_message(const std::string& program_name) const;
 	void print_version_string() const;
+	void print_impls() const;
 	argagg::parser m_parser;
 };
