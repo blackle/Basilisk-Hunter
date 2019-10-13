@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <iostream>
 
 class SHA256ImplMetadata {
 public:
@@ -21,5 +20,3 @@ private:
 	bool m_supported;
 	bool m_working;
 };
-
-std::ostream& operator<<(std::ostream& o, const SHA256ImplMetadata& md);

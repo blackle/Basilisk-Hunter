@@ -2,6 +2,7 @@
 #include <model/Configuration.h>
 #include <crypto/SHA256ImplFactory.h>
 #include <iostream>
+#include <iomanip>
 #include <version.h>
 
 //weh, I wanted to use constexpr for this whole thing!
@@ -74,10 +75,21 @@ void ArgumentParser::print_version_string() const
 
 void ArgumentParser::print_impls() const
 {
+	static const std::string SEP = " | ";
 	auto impl_list = SHA256ImplFactory::impl_list();
 
-	std::cout << "Name\tSupported?\tWorking?" << std::endl;
+	std::cout << SEP << std::left << std::setw(8) << "Name" << SEP
+		  << std::right << std::setw(10) << "Supported?" << SEP
+		  << std::right << std::setw(8) << "Working?" << SEP
+		  << std::endl;
+	std::cout << " +----------+------------+----------+ " << std::endl;
 	for (const SHA256ImplMetadata& md : impl_list) {
-		std::cout << md << std::endl;
+		std::string supported = (md.supported() ? "Yes" : "No");
+		std::string working = (md.supported() ? (md.working() ? "Yes" : "No") : "N/A");
+		std::cout << SEP << std::left << std::setw(8) << md.name() << SEP
+			  << std::right << std::setw(10) << supported << SEP
+			  << std::right << std::setw(8) << working << SEP
+			  << std::endl;
+
 	}
 }

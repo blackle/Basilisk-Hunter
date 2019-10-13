@@ -28,12 +28,3 @@ void SHA256ImplMetadata::set_working(bool working) {
 bool SHA256ImplMetadata::working() const {
 	return m_working;
 }
-
-std::ostream& operator<<(std::ostream& os, const SHA256ImplMetadata& md) {
-	os << md.name()
-	   << "\t"
-	   << (md.supported() ? "Yes" : "No")
-	   << "\t"
-	   << (md.supported() ? (md.working() ? "Yes" : "No") : "N/A");
-	return os;
-}
