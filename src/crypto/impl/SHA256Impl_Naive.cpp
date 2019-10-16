@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <array>
 #include <cstring>
+#include <crypto/bswap.h>
 
 //code by goshhhy from the original terrible-hash-inverter project
 static uint32_t ror32( uint32_t input, size_t shifts ) {
@@ -26,7 +27,7 @@ void SHA256Impl_Naive::calc_block(SHA256State* state, const SHA256Block* block) 
 	SHA256State h(*state);
 	// load data into message schedule
 	for ( i = 0; i < 16; i++ )
-		w[i] = _byteswap_ulong( reinterpret_cast<const uint32_t*>(block->data())[i] );
+		w[i] = bswap64( reinterpret_cast<const uint32_t*>(block->data())[i] );
 
 	// fill remainder of message schedule
 	for ( i = 16; i < 64; i++ ) {
