@@ -27,7 +27,7 @@ void SHA256Impl_Naive::calc_block(SHA256State* state, const SHA256Block* block) 
 	SHA256State h(*state);
 	// load data into message schedule
 	for ( i = 0; i < 16; i++ )
-		w[i] = bswap64( reinterpret_cast<const uint32_t*>(block->data())[i] );
+		w[i] = bswap32( reinterpret_cast<const uint32_t*>(block->data())[i] );
 
 	// fill remainder of message schedule
 	for ( i = 16; i < 64; i++ ) {
