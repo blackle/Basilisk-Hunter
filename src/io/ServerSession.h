@@ -3,7 +3,8 @@
 #include <model/Challenge.h>
 #include <vector>
 #include <string>
-#include <cpr/cpr.h>
+#include <memory>
+#include <yhirose/httplib.h>
 
 class Configuration;
 
@@ -17,9 +18,8 @@ public:
 	void post_hash_count(uint64_t hashes) const;
 
 private:
-	cpr::Header default_headers() const;
-	cpr::Url make_url(const std::string& path) const;
-
 	const Configuration* m_config;
+	std::unique_ptr<httplib::Client> m_client;
 	const std::string m_session_key;
+	const httplib::Headers m_headers;
 };

@@ -6,11 +6,6 @@ set (VERSION_MAJOR 0)
 set (VERSION_MINOR 1)
 set (VERSION_PATCH 0)
 
-set(BUILD_CPR_TESTS OFF)
-set(CURL_STATICLIB ON)
-add_subdirectory(cpr)
-include_directories(${CPR_INCLUDE_DIRS})
-
 include_directories(include)
 include_directories(src)
 file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h" "src/*.c")

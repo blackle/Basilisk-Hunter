@@ -14,6 +14,7 @@
 #include <memory>
 #include <csignal>
 #include <cstdlib>
+#include <util/UrlParser.h>
 
 namespace chrono = std::chrono;
 

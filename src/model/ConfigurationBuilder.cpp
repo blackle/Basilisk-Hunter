@@ -1,16 +1,22 @@
 #include "ConfigurationBuilder.h"
 #include "Configuration.h"
 #include <io/ArgumentParser.h>
+#include <util/UrlParser.h>
 #include <crypto/SHA256ImplFactory.h>
 #include <crypto/SHA256Impl.h>
 #include <stdexcept>
 #include <iostream>
 
 const Configuration* ConfigurationBuilder::build(int argc, char** argv) {
-	ArgumentParser parser;
-	Configuration* config = parser.parse(argc, argv);
+	ArgumentParser arg_parser;
+	Configuration* config = arg_parser.parse(argc, argv);
 	if (config == nullptr) {
 		return nullptr;
+	}
+
+	UrlParser url_parser(config->server());
+	if (!url_parser.is_valid()) {
+		throw std::runtime_error("Server url is invalid.");
 	}
 
 	if (config->threads() == 0) {
