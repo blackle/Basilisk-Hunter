@@ -1,19 +1,19 @@
 #include "SHA256Impl.h"
 
 void SHA256Impl::copy_state_into_block(const SHA256State* state, SHA256Block* block) {
-#if __LP64__
+#if defined(__LP64__) || defined(_WIN64)
 	//todo: this could potentially be faster with AVX2's _mm256_shuffle_epi8
 	//don't worry about alignment here, CRYPTO_ALIGNMENT should take care of it
 	auto block_alias = reinterpret_cast<uint64_t*>(block->data());
 	auto state_alias = reinterpret_cast<const uint64_t*>(state->data());
 	for (unsigned i = 0; i < SHA256_STATE_SIZE/2; i++) {
-		block_alias[i] = __builtin_bswap64((state_alias[i] << 32) | (state_alias[i] >> 32));
+		block_alias[i] = _byteswap_uint64((state_alias[i] << 32) | (state_alias[i] >> 32));
 	}
 #else
 	auto block_alias = reinterpret_cast<uint32_t*>(block->data());
 	auto state_alias = reinterpret_cast<const uint32_t*>(state->data());
 	for (unsigned i = 0; i < SHA256_STATE_SIZE; i++) {
-		block_alias[i] = __builtin_bswap32(state_alias[i]);
+		block_alias[i] = _byteswap_ulong(state_alias[i]);
 	}
 #endif
 }
