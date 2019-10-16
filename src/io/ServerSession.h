@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <memory>
+#define HTTPLIB_CLIENT_ONLY
 #include <yhirose/httplib.h>
 
 class Configuration;

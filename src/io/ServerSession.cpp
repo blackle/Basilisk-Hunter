@@ -1,6 +1,5 @@
 #include "ServerSession.h"
 #include "ChallengeValidator.h"
-#include "QEncoder.h"
 #include <json/Challenge_json.h>
 #include <model/Configuration.h>
 #include <util/NonceUtil.h>
@@ -15,7 +14,7 @@ ServerSession::ServerSession(const Configuration* config)
 	, m_session_key(NonceUtil::build(20))
 	, m_headers({
 		{"Basilisk-Session-Key", m_session_key},
-		{"Basilisk-User-Name", QEncoder::encode_utf8(m_config->name())},
+		{"Basilisk-User-Name", httplib::detail::base64_encode(m_config->name())},
 		{"User-Agent", USER_AGENT_STRING}
 	})
 {

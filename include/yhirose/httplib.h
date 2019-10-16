@@ -340,6 +340,7 @@ private:
   std::string buffer;
 };
 
+#ifndef HTTPLIB_CLIENT_ONLY
 class TaskQueue {
 public:
   TaskQueue() {}
@@ -455,7 +456,6 @@ private:
 };
 #endif
 
-#if defined HTTPLIB_USE_SERVER
 class Server {
 public:
   typedef std::function<void(const Request &, Response &)> Handler;
@@ -710,7 +710,7 @@ private:
   SSL *ssl_;
 };
 
-#if defined HTTPLIB_USE_SERVER
+#ifndef HTTPLIB_CLIENT_ONLY
 class SSLServer : public Server {
 public:
   SSLServer(const char *cert_path, const char *private_key_path,
@@ -2229,7 +2229,7 @@ inline std::string BufferStream::get_remote_addr() const { return ""; }
 inline const std::string &BufferStream::get_buffer() const { return buffer; }
 
 // HTTP server implementation
-#if defined HTTPLIB_USE_SERVER
+#ifndef HTTPLIB_CLIENT_ONLY
 inline Server::Server()
     : keep_alive_max_count_(CPPHTTPLIB_KEEPALIVE_MAX_COUNT),
       payload_max_length_(CPPHTTPLIB_PAYLOAD_MAX_LENGTH), is_running_(false),
@@ -3436,7 +3436,7 @@ inline std::string SSLSocketStream::get_remote_addr() const {
 }
 
 // SSL HTTP server implementation
-#if defined HTTPLIB_USE_SERVER
+#ifndef HTTPLIB_CLIENT_ONLY
 inline SSLServer::SSLServer(const char *cert_path, const char *private_key_path,
                             const char *client_ca_cert_file_path,
                             const char *client_ca_cert_dir_path) {
