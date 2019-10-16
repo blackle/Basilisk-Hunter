@@ -455,6 +455,7 @@ private:
 };
 #endif
 
+#if defined HTTPLIB_USE_SERVER
 class Server {
 public:
   typedef std::function<void(const Request &, Response &)> Handler;
@@ -535,6 +536,7 @@ private:
   Handler error_handler_;
   Logger logger_;
 };
+#endif
 
 class Client {
 public:
@@ -708,6 +710,7 @@ private:
   SSL *ssl_;
 };
 
+#if defined HTTPLIB_USE_SERVER
 class SSLServer : public Server {
 public:
   SSLServer(const char *cert_path, const char *private_key_path,
@@ -724,6 +727,7 @@ private:
   SSL_CTX *ctx_;
   std::mutex ctx_mutex_;
 };
+#endif
 
 class SSLClient : public Client {
 public:
@@ -2225,6 +2229,7 @@ inline std::string BufferStream::get_remote_addr() const { return ""; }
 inline const std::string &BufferStream::get_buffer() const { return buffer; }
 
 // HTTP server implementation
+#if defined HTTPLIB_USE_SERVER
 inline Server::Server()
     : keep_alive_max_count_(CPPHTTPLIB_KEEPALIVE_MAX_COUNT),
       payload_max_length_(CPPHTTPLIB_PAYLOAD_MAX_LENGTH), is_running_(false),
@@ -2738,6 +2743,7 @@ inline bool Server::process_and_close_socket(socket_t sock) {
                                nullptr);
       });
 }
+#endif
 
 // HTTP client implementation
 inline Client::Client(const char *host, int port, time_t timeout_sec)
@@ -3430,6 +3436,7 @@ inline std::string SSLSocketStream::get_remote_addr() const {
 }
 
 // SSL HTTP server implementation
+#if defined HTTPLIB_USE_SERVER
 inline SSLServer::SSLServer(const char *cert_path, const char *private_key_path,
                             const char *client_ca_cert_file_path,
                             const char *client_ca_cert_dir_path) {
@@ -3484,6 +3491,7 @@ inline bool SSLServer::process_and_close_socket(socket_t sock) {
                                [&](Request &req) { req.ssl = ssl; });
       });
 }
+#endif
 
 // SSL HTTP client implementation
 inline SSLClient::SSLClient(const char *host, int port, time_t timeout_sec,
