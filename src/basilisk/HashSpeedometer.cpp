@@ -13,11 +13,11 @@ void HashSpeedometer::start()
 }
 
 float HashSpeedometer::seconds() {
-	return m_timer.elapsed<chrono::milliseconds>() / 1000.0;
+	return m_timer.elapsed<chrono::milliseconds>() / 1000.0f;
 }
 
 float HashSpeedometer::million_hashes() {
-	return (float)(m_batcher->batches() - m_batches) * m_batcher->batch_size() / 1000000.0;
+	return (float)(m_batcher->batches() - m_batches) * m_batcher->batch_size() / 1000000.0f;
 }
 
 float HashSpeedometer::million_hashes_per_second()

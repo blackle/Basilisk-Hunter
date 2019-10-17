@@ -881,6 +881,7 @@ option_results& parser_results::operator [] (const std::string& name)
 try {
   return this->options.at(name);
 } catch (const std::out_of_range& e) {
+  (void) e;
   std::ostringstream msg;
   msg << "no option named \"" << name << "\" in parser_results";
   throw unknown_option(msg.str());
@@ -893,6 +894,7 @@ parser_results::operator [] (const std::string& name) const
 try {
   return this->options.at(name);
 } catch (const std::out_of_range& e) {
+  (void) e;
   std::ostringstream msg;
   msg << "no option named \"" << name << "\" in parser_results";
   throw unknown_option(msg.str());

@@ -10,7 +10,7 @@
 #include <iostream>
 
 template<typename T>
-static void test_impl(std::string& best_name, int& best_time)
+static void test_impl(std::string& best_name, int64_t& best_time)
 {
 	T impl;
 	if (impl.supported() && SHA256Tester::verify(&impl)) {
@@ -26,7 +26,7 @@ static void test_impl(std::string& best_name, int& best_time)
 std::string SHA256ImplFactory::get_best_impl_name()
 {
 	std::string best_name;
-	int best_time = -1;
+	int64_t best_time = -1;
 
 	test_impl<SHA256Impl_Naive>    (best_name, best_time);
 	test_impl<SHA256Impl_SSE4>     (best_name, best_time);

@@ -48,7 +48,7 @@ void SHA256Block::init_padding(size_type total_length)
 		throw std::runtime_error("Cannot pad this block, not enough room!");
 	}
 
-	std::fill(content_end(), end(), 0);
+	std::fill(content_end(), end(), '\0');
 	*content_end() = 0x80;
 
 	auto packed_length = pack_64(total_length * 8);

@@ -65,7 +65,7 @@ add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
 target_link_libraries(basilisk_hunter Threads::Threads cpu_features ${CPR_LIBRARIES})
 
 if(MSVC)
-set(CMAKE_CXX_FLAGS "/GL")
+set(CMAKE_CXX_FLAGS "/O2 /W4 /WX /EHsc /GL")
 set(CMAKE_EXE_LINKER_FLAGS "/LTCG")
 else()
 set(CMAKE_CXX_FLAGS "-O3 -Werror -Wall -Wextra -flto")

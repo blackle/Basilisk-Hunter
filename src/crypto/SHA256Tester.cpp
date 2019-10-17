@@ -21,7 +21,7 @@ bool SHA256Tester::verify(const SHA256Impl* impl)
 	return os.str() == "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
 }
 
-int SHA256Tester::benchmark(const SHA256Impl* impl)
+int64_t SHA256Tester::benchmark(const SHA256Impl* impl)
 {
 	SHA256State state;
 	SHA256Block block("", 0);
@@ -32,5 +32,5 @@ int SHA256Tester::benchmark(const SHA256Impl* impl)
 	}
 	chrono::time_point<chrono::steady_clock> stop = chrono::steady_clock::now();
 
-	return chrono::duration_cast<chrono::milliseconds>(stop - start).count();
+	return static_cast<int64_t>(chrono::duration_cast<chrono::milliseconds>(stop - start).count());
 }

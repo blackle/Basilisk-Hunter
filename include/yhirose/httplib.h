@@ -1696,7 +1696,7 @@ inline std::string decode_url(const std::string &s) {
         int val = 0;
         if (from_hex_to_i(s, i + 1, 2, val)) {
           // 2 digits hex codes
-          result += val;
+          result += static_cast<char>(val);
           i += 2; // '00'
         } else {
           result += s[i];
@@ -1818,9 +1818,9 @@ inline bool parse_range_header(const std::string &s, Ranges &ranges) {
       auto len = m.length(1);
       detail::split(&s[pos], &s[pos + len], ',',
                     [&](const char *b, const char *e) {
-                      static auto re = std::regex(R"(\s*(\d*)-(\d*))");
+                      static auto re2 = std::regex(R"(\s*(\d*)-(\d*))");
                       std::cmatch m;
-                      if (std::regex_match(b, e, m, re)) {
+                      if (std::regex_match(b, e, m, re2)) {
                         ssize_t first = -1;
                         if (!m.str(1).empty()) {
                           first = static_cast<ssize_t>(std::stoll(m.str(1)));
@@ -1847,7 +1847,7 @@ inline std::string to_lower(const char *beg, const char *end) {
   std::string out;
   auto it = beg;
   while (it != end) {
-    out += ::tolower(*it);
+    out += static_cast<char>(::tolower(*it));
     it++;
   }
   return out;
