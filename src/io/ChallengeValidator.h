@@ -10,7 +10,7 @@ class Challenge;
 class ChallengeValidator
 {
 public:
-	ChallengeValidator(const Configuration* config);
+	explicit ChallengeValidator(const Configuration* config);
 	bool validate(const Challenge& challenge);
 private:
 	const Configuration* m_config;

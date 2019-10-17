@@ -4,7 +4,7 @@
 
 class UrlParser {
 public:
-	UrlParser(const std::string& url);
+	explicit UrlParser(const std::string& url);
 
 	bool is_valid() const;
 	const std::string& schema() const;

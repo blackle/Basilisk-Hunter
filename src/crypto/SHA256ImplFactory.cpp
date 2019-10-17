@@ -59,7 +59,7 @@ const SHA256Impl* SHA256ImplFactory::get_impl(const std::string& impl_name)
 }
 
 template <typename T>
-void add_impl(std::vector<SHA256ImplMetadata>& md_list)
+static void add_impl(std::vector<SHA256ImplMetadata>& md_list)
 {
 	SHA256ImplMetadata md;
 	md.set_name(T::name());

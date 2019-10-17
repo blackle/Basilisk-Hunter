@@ -22,7 +22,7 @@ static const uint32_t sha256_constants[] = {
 
 void SHA256Impl_Naive::calc_block(SHA256State* state, const SHA256Block* block) const
 {
-	uint32_t i, s0, s1, t1, t2, maj, ch;
+	uint32_t i, s0, s1;
 	std::array<uint32_t, 64> w;
 	SHA256State h(*state);
 	// load data into message schedule
@@ -39,11 +39,11 @@ void SHA256Impl_Naive::calc_block(SHA256State* state, const SHA256Block* block) 
 	// the actual transform
 	for ( i = 0; i < 64; i++ ) {
 		s1 = ror32( h[4], 6 ) ^ ror32( h[4], 11 ) ^ ror32( h[4], 25 );
-		ch = ( h[4] & h[5] ) ^ ( ( ~h[4] ) & h[6] );
-		t1 = h[7] + s1 + ch + sha256_constants[i] + w[i];
+		uint32_t ch = ( h[4] & h[5] ) ^ ( ( ~h[4] ) & h[6] );
+		uint32_t t1 = h[7] + s1 + ch + sha256_constants[i] + w[i];
 		s0 = ror32( h[0], 2 ) ^ ror32( h[0], 13 ) ^ ror32( h[0], 22 );
-		maj = ( h[0] & h[1] ) ^ ( h[0] & h[2] ) ^ ( h[1] & h[2] );
-		t2 = s0 + maj;
+		uint32_t maj = ( h[0] & h[1] ) ^ ( h[0] & h[2] ) ^ ( h[1] & h[2] );
+		uint32_t t2 = s0 + maj;
 
 		h[7] = h[6];
 		h[6] = h[5];
