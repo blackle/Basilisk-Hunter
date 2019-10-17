@@ -61,7 +61,7 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 set(CMAKE_CXX_STANDARD 11)
 
-add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS})
+add_executable(basilisk_hunter ${SOURCES} ${YASM_OBJECTS} "resources.rc")
 target_link_libraries(basilisk_hunter Threads::Threads cpu_features ${CPR_LIBRARIES})
 
 if(MSVC)

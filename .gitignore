@@ -1,3 +1,5 @@
 build
 /.vs
 /CMakeSettings.json
+/resources.aps
+/resource.h
