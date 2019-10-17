@@ -3,6 +3,7 @@
 #include "Batcher.h"
 #include <vector>
 #include <string>
+#include <memory>
 
 class Worker;
 class Challenge;
@@ -18,6 +19,6 @@ public:
 	virtual unsigned batch_size() const override;
 
 private:
-	std::vector<Worker*> m_workers;
+	std::vector<std::shared_ptr<Worker>> m_workers;
 	const unsigned m_batch_size;
 };

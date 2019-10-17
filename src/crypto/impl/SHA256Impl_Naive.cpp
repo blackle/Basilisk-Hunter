@@ -1,7 +1,6 @@
 #include "SHA256Impl_Naive.h"
 #include <stdint.h>
 #include <array>
-#include <cstring>
 #include <crypto/bswap.h>
 
 //code by goshhhy from the original terrible-hash-inverter project

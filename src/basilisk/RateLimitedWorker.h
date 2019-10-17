@@ -7,7 +7,7 @@ template <typename T> class LockBox;
 class RateLimitedWorker : public Worker {
 public:
 	RateLimitedWorker(LockBox<Challenge>* box, const Configuration* config, float limit);
-	virtual ~RateLimitedWorker();
+	virtual ~RateLimitedWorker() = default;
 
 protected:
 	virtual bool do_batch() override;

@@ -9,7 +9,7 @@ class CRYPTO_ALIGNMENT SHA256State : public std::array<uint32_t, SHA256_STATE_SI
 {
 public:
 	SHA256State();
-	explicit SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init);
+	explicit SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init) noexcept;
 	void reset();
 
 private:

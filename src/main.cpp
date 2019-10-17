@@ -23,7 +23,7 @@ static std::atomic_bool RUNNING(true);
 
 static void interrupt_handler(int signal)
 {
-	if (RUNNING == false) {
+	if (!RUNNING) {
 		exit(signal);
 	}
 	std::cout << "Shutting down..." << std::endl;
@@ -54,7 +54,7 @@ int main(int argc, char** argv)
 	std::vector<Challenge> challenges;
 	ServerSession session(config.get());
 	if (config->offline()) {
-		challenges.push_back(Challenge("default_offline", "basilisk:0000000000:", 64));
+		challenges.emplace_back(Challenge("default_offline", "basilisk:0000000000:", 64));
 	} else {
 		std::cout << "Contacting server..." << std::endl;
 		try {

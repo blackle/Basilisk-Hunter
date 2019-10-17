@@ -17,7 +17,7 @@ float HashSpeedometer::seconds() {
 }
 
 float HashSpeedometer::million_hashes() {
-	return (float)(m_batcher->batches() - m_batches) * m_batcher->batch_size() / 1000000.0f;
+	return static_cast<float>(m_batcher->batches() - m_batches) * m_batcher->batch_size() / 1000000.0f;
 }
 
 float HashSpeedometer::million_hashes_per_second()

@@ -12,12 +12,9 @@ Worker::Worker(LockBox<Challenge>* box, const Configuration* config)
 	, m_running(true)
 {
 	const Unlocker<Challenge> challenge(m_box);
-	m_sha.reset(SHA256ImplFactory::get_impl(config->impl()));
+	m_sha = SHA256ImplFactory::get_impl(config->impl());
 	m_basilisk.reset(new Basilisk(m_sha.get(), challenge->prefix(), challenge->nonce_length()));
 }
-
-Worker::~Worker()
-{}
 
 unsigned Worker::batches() const {
 	return m_batches.load();

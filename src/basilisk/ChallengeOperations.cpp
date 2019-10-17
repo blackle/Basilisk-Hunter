@@ -18,8 +18,7 @@ bool ChallengeOperations::reconcile_solutions(LockBox<Challenge>* box, Solution&
 	if (s < challenge->solution()) {
 		challenge->set_solution(s);
 		return true;
-	} else {
-		s = challenge->solution();
-		return false;
 	}
+	s = challenge->solution();
+	return false;
 }

@@ -14,5 +14,5 @@ public:
 	bool validate(const Challenge& challenge);
 private:
 	const Configuration* m_config;
-	std::unique_ptr<const SHA256Impl> m_sha;
+	std::shared_ptr<const SHA256Impl> m_sha;
 };

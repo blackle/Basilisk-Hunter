@@ -6,6 +6,7 @@
 #include <crypto/SHA256Impl.h>
 #include <stdexcept>
 #include <iostream>
+#include <memory>
 
 const Configuration* ConfigurationBuilder::build(int argc, char** argv) {
 	ArgumentParser arg_parser;
@@ -31,10 +32,9 @@ const Configuration* ConfigurationBuilder::build(int argc, char** argv) {
 		}
 	} else {
 		auto test_impl = SHA256ImplFactory::get_impl(config->impl());
-		if (test_impl == nullptr || !test_impl->supported()) {
+		if (!test_impl || !test_impl->supported()) {
 			throw std::runtime_error("The implementation \"" + config->impl() + "\" does not exist or is unsupported.");
 		}
-		delete test_impl;
 	}
 
 	return config;

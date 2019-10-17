@@ -7,7 +7,7 @@ SHA256State::SHA256State()
 	: super(sha256_h0)
 {}
 
-SHA256State::SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init)
+SHA256State::SHA256State(const std::array<uint32_t, SHA256_STATE_SIZE>& init) noexcept
 	: super(init)
 {}
 

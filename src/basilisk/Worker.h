@@ -16,7 +16,7 @@ class Basilisk;
 class Worker : public Batcher {
 public:
 	Worker(LockBox<Challenge>* box, const Configuration* config);
-	virtual ~Worker();
+	virtual ~Worker() = default;
 
 	virtual unsigned batches() const override;
 	virtual unsigned batch_size() const override;

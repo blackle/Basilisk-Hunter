@@ -14,9 +14,6 @@ RateLimitedWorker::RateLimitedWorker(LockBox<Challenge>* box, const Configuratio
 	, m_speedometer(this)
 {}
 
-RateLimitedWorker::~RateLimitedWorker()
-{}
-
 bool RateLimitedWorker::do_batch()
 {
 	if (m_speedometer.seconds() > 1) {
@@ -24,14 +21,14 @@ bool RateLimitedWorker::do_batch()
 	}
 
 	bool ret = super::do_batch();
-	if (ret == false) {
+	if (!ret) {
 		return false;
 	}
 
 	float mh = m_speedometer.million_hashes();
 	float seconds = m_speedometer.seconds();
 	double seconds_to_wait = std::max(mh/m_limit - seconds, 0.f);
-	uint64_t microseconds_to_wait = static_cast<uint64_t>(seconds_to_wait * MICROSECONDS_IN_SECOND);
+	auto microseconds_to_wait = static_cast<uint64_t>(seconds_to_wait * MICROSECONDS_IN_SECOND);
 
 	std::this_thread::sleep_for(chrono::microseconds(microseconds_to_wait));
 	return true;

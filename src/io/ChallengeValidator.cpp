@@ -8,7 +8,7 @@
 
 ChallengeValidator::ChallengeValidator(const Configuration* config)
 	: m_config(config)
-	, m_sha(SHA256ImplFactory::get_impl(m_config->impl()))
+ 	, m_sha(SHA256ImplFactory::get_impl(m_config->impl()))
 {}
 
 bool ChallengeValidator::validate(const Challenge& challenge)
