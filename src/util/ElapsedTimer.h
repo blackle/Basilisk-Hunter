@@ -10,7 +10,7 @@ public:
 	void start();
 
 	template <typename T>
-	auto elapsed() {
+	typename T::rep elapsed() {
 		auto end = std::chrono::steady_clock::now();
 		return chrono::duration_cast<T>(end - m_start).count();
 	}
